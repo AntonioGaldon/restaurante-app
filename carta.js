@@ -6,7 +6,7 @@ const API_URL = window.location.origin;
 // =============================
 // 📌 VARIABLES
 // =============================
-let productos = []; // Ahora se carga desde la API
+let productos = [];
 let carrito = [];
 const productosContainer = document.getElementById("productosContainer");
 const carritoItems = document.getElementById("carritoItems");
@@ -14,7 +14,7 @@ const totalCarrito = document.getElementById("totalCarrito");
 const finalizarPedido = document.getElementById("finalizarPedido");
 const filtrosContainer = document.getElementById("filtros");
 
-// Modal datos cliente
+// Modal pedido
 const pedidoModal = document.getElementById("pedidoModal");
 const cancelarPedido = document.getElementById("cancelarPedido");
 const confirmarPedido = document.getElementById("confirmarPedido");
@@ -22,6 +22,11 @@ const alergenosInput = document.getElementById("alergenos");
 const comentarioPedidoInput = document.getElementById("comentarioPedido");
 const direccionEntregaInput = document.getElementById("direccionEntrega");
 const telefonoContactoInput = document.getElementById("telefonoContacto");
+
+// Modal upsell
+const upsellModal = document.getElementById("upsellModal");
+const btnSaltarUpsell = document.getElementById("saltarUpsell");
+const btnContinuarUpsell = document.getElementById("continuarUpsell");
 
 // Botón flotante y contador
 const carritoFlotante = document.getElementById("carritoFlotante");
@@ -37,7 +42,7 @@ async function cargarProductosDesdeAPI() {
     productos = await response.json();
     
     if (productos.length === 0) {
-      productosContainer.innerHTML = "<p style='text-align:center; padding:40px;'>No hay productos disponibles. Añade productos desde el panel de administración.</p>";
+      productosContainer.innerHTML = "<p style='text-align:center; padding:40px;'>No hay productos disponibles.</p>";
       return;
     }
     
@@ -83,10 +88,7 @@ function renderProductos(categoria = "Todas") {
   filtrados.forEach(p => {
     const card = document.createElement("div");
     card.classList.add("card");
-    
-    // Imagen por defecto si no tiene
     const imgUrl = p.img || "https://via.placeholder.com/400x300?text=Sin+Imagen";
-    
     card.innerHTML = `
       <img src="${imgUrl}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">
       <div class="card-content">
@@ -100,15 +102,12 @@ function renderProductos(categoria = "Todas") {
           <div class="contador"></div>
         </div>
       </div>`;
-    
     productosContainer.appendChild(card);
-    
     const agregarBtn = card.querySelector(".agregarBtn");
     agregarBtn.addEventListener("click", () => {
       agregarAlCarrito(p.id);
       renderCardContador(card, p.id);
     });
-    
     renderCardContador(card, p.id);
   });
 }
@@ -121,33 +120,21 @@ function renderCardContador(card, productoId) {
   const agregarBtn = accionesDiv.querySelector(".agregarBtn");
   const contadorDiv = accionesDiv.querySelector(".contador");
   const cantidad = carrito.find(i => i.id === productoId)?.cantidad || 0;
-  
   contadorDiv.innerHTML = "";
-  
   if (cantidad === 0) {
     agregarBtn.style.display = "block";
     contadorDiv.style.display = "none";
   } else {
     agregarBtn.style.display = "none";
     contadorDiv.style.display = "flex";
-    
     const menosBtn = document.createElement("button");
     menosBtn.textContent = cantidad === 1 ? "🗑" : "-";
-    menosBtn.onclick = () => {
-      quitarDelCarrito(productoId);
-      renderCardContador(card, productoId);
-    };
-    
+    menosBtn.onclick = () => { quitarDelCarrito(productoId); renderCardContador(card, productoId); };
     const span = document.createElement("span");
     span.textContent = cantidad;
-    
     const masBtn = document.createElement("button");
     masBtn.textContent = "+";
-    masBtn.onclick = () => {
-      agregarAlCarrito(productoId);
-      renderCardContador(card, productoId);
-    };
-    
+    masBtn.onclick = () => { agregarAlCarrito(productoId); renderCardContador(card, productoId); };
     contadorDiv.appendChild(menosBtn);
     contadorDiv.appendChild(span);
     contadorDiv.appendChild(masBtn);
@@ -160,13 +147,8 @@ function renderCardContador(card, productoId) {
 function agregarAlCarrito(id) {
   const producto = productos.find(p => p.id === id);
   if (!producto) return;
-  
   const item = carrito.find(i => i.id === id);
-  if (item) {
-    item.cantidad++;
-  } else {
-    carrito.push({ ...producto, cantidad: 1 });
-  }
+  if (item) { item.cantidad++; } else { carrito.push({ ...producto, cantidad: 1 }); }
   renderCarrito();
 }
 
@@ -174,9 +156,7 @@ function quitarDelCarrito(id) {
   const index = carrito.findIndex(i => i.id === id);
   if (index > -1) {
     carrito[index].cantidad--;
-    if (carrito[index].cantidad <= 0) {
-      carrito.splice(index, 1);
-    }
+    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
   }
   renderCarrito();
 }
@@ -184,51 +164,122 @@ function quitarDelCarrito(id) {
 function renderCarrito() {
   carritoItems.innerHTML = "";
   let total = 0;
-  
   carrito.forEach(i => {
     const li = document.createElement("li");
     li.textContent = `${i.nombre} x${i.cantidad} - ${(i.precio * i.cantidad).toFixed(2)} €`;
     carritoItems.appendChild(li);
     total += i.precio * i.cantidad;
   });
-  
   totalCarrito.textContent = total.toFixed(2);
-  
-  // Mostrar u ocultar botón finalizar
   finalizarPedido.style.display = carrito.length > 0 ? "block" : "none";
-  
-  // Actualizar contador flotante
   if (cantidadCarritoBtn) {
     cantidadCarritoBtn.textContent = carrito.reduce((sum, i) => sum + i.cantidad, 0);
   }
 }
 
 // =============================
+// 🔹 MODAL UPSELL
+// =============================
+function mostrarUpsell() {
+  const categoriasSugeridas = ["Entrantes", "Bebidas", "Postres"];
+  const productosSugeridos = productos.filter(p =>
+    categoriasSugeridas.includes(p.categoria) &&
+    !carrito.find(i => i.id === p.id)
+  );
+
+  if (productosSugeridos.length === 0) {
+    pedidoModal.classList.add("show");
+    return;
+  }
+
+  const container = document.getElementById("upsellProductos");
+  container.innerHTML = "";
+
+  productosSugeridos.forEach(p => {
+    const div = document.createElement("div");
+    div.classList.add("upsell-card");
+    div.innerHTML = `
+      <img src="${p.img || 'https://via.placeholder.com/80'}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/80'">
+      <div class="upsell-info">
+        <span class="upsell-nombre">${p.nombre}</span>
+        <span class="upsell-precio">${parseFloat(p.precio).toFixed(2)} €</span>
+      </div>
+      <div class="upsell-acciones">
+        <button class="upsell-agregar-btn">Añadir</button>
+        <div class="upsell-contador" style="display:none;">
+          <button class="upsell-menos">-</button>
+          <span>0</span>
+          <button class="upsell-mas">+</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+
+    div.querySelector(".upsell-agregar-btn").addEventListener("click", () => {
+      agregarAlCarrito(p.id);
+      actualizarUpsellContador(div, p.id);
+    });
+    div.querySelector(".upsell-menos").addEventListener("click", () => {
+      quitarDelCarrito(p.id);
+      actualizarUpsellContador(div, p.id);
+    });
+    div.querySelector(".upsell-mas").addEventListener("click", () => {
+      agregarAlCarrito(p.id);
+      actualizarUpsellContador(div, p.id);
+    });
+  });
+
+  upsellModal.classList.add("show");
+}
+
+function actualizarUpsellContador(div, productoId) {
+  const cantidad = carrito.find(i => i.id === productoId)?.cantidad || 0;
+  const agregarBtn = div.querySelector(".upsell-agregar-btn");
+  const contadorDiv = div.querySelector(".upsell-contador");
+  const span = contadorDiv.querySelector("span");
+  const menosBtn = contadorDiv.querySelector(".upsell-menos");
+  if (cantidad === 0) {
+    agregarBtn.style.display = "block";
+    contadorDiv.style.display = "none";
+  } else {
+    agregarBtn.style.display = "none";
+    contadorDiv.style.display = "flex";
+    span.textContent = cantidad;
+    menosBtn.textContent = cantidad === 1 ? "🗑" : "-";
+  }
+}
+
+btnSaltarUpsell.addEventListener("click", () => {
+  upsellModal.classList.remove("show");
+  pedidoModal.classList.add("show");
+});
+
+btnContinuarUpsell.addEventListener("click", () => {
+  upsellModal.classList.remove("show");
+  pedidoModal.classList.add("show");
+});
+
+// =============================
 // 🔹 MODAL FORMULARIO CLIENTE
 // =============================
 finalizarPedido.addEventListener("click", () => {
   if (carrito.length === 0) return;
-  pedidoModal.classList.add("show");
+  mostrarUpsell();
 });
 
-// Cerrar modal
 cancelarPedido.addEventListener("click", () => {
   pedidoModal.classList.remove("show");
 });
 
-// Confirmar pedido
 confirmarPedido.addEventListener("click", async () => {
   const direccion = direccionEntregaInput.value.trim();
   const telefono = telefonoContactoInput.value.trim();
-  
   if (!direccion || !telefono) {
     alert("Dirección y teléfono son obligatorios");
     return;
   }
-  
-  // Preparar datos del pedido
   const pedidoData = {
-    cliente_id: 1, // ID temporal - deberías implementar login de clientes
+    cliente_id: 1,
     productos: carrito.map(item => ({
       producto_id: item.id,
       cantidad: item.cantidad
@@ -238,39 +289,22 @@ confirmarPedido.addEventListener("click", async () => {
     direccion: direccion,
     telefono: telefono
   };
-  
   try {
     const response = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pedidoData)
     });
-    
-    if (!response.ok) {
-      throw new Error("Error al crear el pedido");
-    }
-    
-    const resultado = await response.json();
-    console.log("Pedido creado:", resultado);
-    
+    if (!response.ok) throw new Error("Error al crear el pedido");
     alert("¡Pedido realizado con éxito! ✅\n\nTu pedido ha sido enviado al restaurante.");
-    
-    // Reset carrito
     carrito = [];
     renderCarrito();
-    
-    // Cerrar modal y limpiar formulario
     pedidoModal.classList.remove("show");
     alergenosInput.value = "";
     comentarioPedidoInput.value = "";
     direccionEntregaInput.value = "";
     telefonoContactoInput.value = "";
-    
-    // Re-renderizar las cards para quitar los contadores
     renderProductos();
-    
   } catch (error) {
     console.error("Error al crear pedido:", error);
     alert("Error al realizar el pedido. Por favor, intenta de nuevo.");
