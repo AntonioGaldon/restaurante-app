@@ -23,8 +23,6 @@
   </div>
   <h1>El Fogón - La Cocina de la Sierra</h1>
   <div id="filtros" class="filtros"></div>
-
-  <!-- Botón admin -->
   <button id="btnAdmin" class="btn-admin">Admin</button>
 </header>
 
@@ -40,6 +38,21 @@
   <p>Total: <span id="totalCarrito">0.00</span> €</p>
   <button id="finalizarPedido" style="display:none;">Realizar Pedido</button>
 </aside>
+
+<!-- ========================= -->
+<!-- MODAL UPSELL -->
+<!-- ========================= -->
+<div id="upsellModal" class="modal">
+  <div class="modal-content upsell-modal-content">
+    <h3>¿Quieres añadir algo más?</h3>
+    <p class="upsell-subtitulo">Completa tu pedido con estos productos</p>
+    <div id="upsellProductos" class="upsell-productos"></div>
+    <div class="modal-buttons">
+      <button id="saltarUpsell">Saltar</button>
+      <button id="continuarUpsell">Continuar con el pedido →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ========================= -->
 <!-- MODAL CONFIRMAR PEDIDO -->
@@ -72,10 +85,8 @@
   🛒 <span id="cantidadCarrito">0</span>
 </button>
 
-<!-- Scripts -->
 <script src="carta.js"></script>
 
-<!-- Registrar Service Worker -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
