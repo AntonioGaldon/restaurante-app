@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4a2e1f">
+  <meta name="description" content="Pedido de comida para llevar - El Fogón">
+  <title>Carta del Restaurante - El Fogón</title>
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="El Fogón">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <img src="img/logo.png" alt="Logo El Fogón" class="logo" onerror="this.style.display='none'">
+  </div>
+  <h1>El Fogón - La Cocina de la Sierra</h1>
+  <div id="filtros" class="filtros"></div>
+
+  <!-- Botón admin -->
+  <button id="btnAdmin" class="btn-admin">Admin</button>
+</header>
+
+<main>
+  <div id="productosContainer" class="productos-container">
+    <p style="text-align:center; padding:40px;">Cargando productos...</p>
+  </div>
+</main>
+
+<aside class="carrito">
+  <h2>Carrito</h2>
+  <ul id="carritoItems"></ul>
+  <p>Total: <span id="totalCarrito">0.00</span> €</p>
+  <button id="finalizarPedido" style="display:none;">Realizar Pedido</button>
+</aside>
+
+<!-- ========================= -->
+<!-- MODAL CONFIRMAR PEDIDO -->
+<!-- ========================= -->
+<div id="pedidoModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirmar Pedido</h3>
+
+    <label>Comentarios sobre alérgenos</label>
+    <textarea id="alergenos" placeholder="Opcional"></textarea>
+
+    <label>Comentario sobre el pedido</label>
+    <textarea id="comentarioPedido" placeholder="Opcional"></textarea>
+
+    <label>Dirección de entrega *</label>
+    <input type="text" id="direccionEntrega" placeholder="Calle y número" required>
+
+    <label>Teléfono de contacto *</label>
+    <input type="tel" id="telefonoContacto" placeholder="Teléfono" required>
+
+    <div class="modal-buttons">
+      <button id="cancelarPedido">Cancelar</button>
+      <button id="confirmarPedido">Confirmar Pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- Botón flotante carrito -->
+<button id="carritoFlotante" class="carrito-flotante">
+  🛒 <span id="cantidadCarrito">0</span>
+</button>
+
+<!-- Scripts -->
+<script src="carta.js"></script>
+
+<!-- Registrar Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('✅ Service Worker registrado:', registration);
+        })
+        .catch(error => {
+          console.log('❌ Error al registrar Service Worker:', error);
+        });
+    });
+  }
+</script>
+
+</body>
+</html>

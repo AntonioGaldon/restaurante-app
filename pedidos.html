@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedidos del Cliente</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 80%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Mis Pedidos</h1>
+  <table id="pedidosTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Productos</th>
+        <th>Total</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API_URL = "http://localhost:5000";
+    const CLIENTE_ID = 2; // Aquí puedes cambiar por el cliente actual
+
+    async function cargarPedidos() {
+      const res = await fetch(`${API_URL}/pedidos`);
+      const pedidos = await res.json();
+      const tbody = document.querySelector("#pedidosTable tbody");
+      tbody.innerHTML = "";
+      pedidos
+        .filter(p => p.cliente_id === CLIENTE_ID) // mostrar solo pedidos de este cliente
+        .forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.pedido_id}</td>
+            <td>${p.fecha}</td>
+            <td>${p.productos}</td>
+            <td>${p.total}</td>
+            <td>${p.estado || "pendiente"}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    cargarPedidos();
+  </script>
+</body>
+</html>

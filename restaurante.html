@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos Restaurante</title>
+  <link rel="stylesheet" href="restaurante.css">
+</head>
+<body>
+
+<header>
+  <h1>Pedidos del Restaurante</h1>
+  <button id="btnVolver">⬅ Volver</button>
+</header>
+
+<!-- FILTROS CHOICE CHIPS -->
+<div class="filtros">
+  <button class="filtro-btn active" data-estado="Todos">Todos</button>
+  <button class="filtro-btn" data-estado="En preparación">En preparación</button>
+  <button class="filtro-btn" data-estado="Entregado">Entregado</button>
+</div>
+
+<!-- CONTENEDOR DE PEDIDOS -->
+<div id="pedidosContainer"></div>
+
+<script src="restaurante.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+// server.js - Versión corregida
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+require("dotenv").config();
+const db = require("./db");
+
+const app = express();
+
+// ===== MIDDLEWARE =====
+app.use(cors());
+app.use(express.json());
+
+// ===== RUTAS HTML =====
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "carta.html")));
+app.get("/carta.html", (req, res) => res.sendFile(path.join(__dirname, "carta.html")));
+app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
+app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
+app.get("/restaurante.html", (req, res) => res.sendFile(path.join(__dirname, "restaurante.html")));
+app.get("/restaurante", (req, res) => res.sendFile(path.join(__dirname, "restaurante.html")));
+
+// ===== ARCHIVOS ESTÁTICOS =====
+// CSS / JS
+app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "style.css")));
+app.get("/carta.js", (req, res) => res.sendFile(path.join(__dirname, "carta.js")));
+app.get("/admin.js", (req, res) => res.sendFile(path.join(__dirname, "admin.js")));
+app.get("/admin.css", (req, res) => res.sendFile(path.join(__dirname, "admin.css")));
+app.get("/restaurante.css", (req, res) => res.sendFile(path.join(__dirname, "restaurante.css")));
+app.get("/restaurante.js", (req, res) => res.sendFile(path.join(__dirname, "restaurante.js")));
+app.get("/manifest.json", (req, res) => res.sendFile(path.join(__dirname, "manifest.json")));
+app.get("/service-worker.js", (req, res) => res.sendFile(path.join(__dirname, "service-worker.js")));
+
+// IMÁGENES
+app.get("/img/:filename", (req, res) => {
+  res.sendFile(path.join(__dirname, "img", req.params.filename));
+});
+
+// ===== RUTAS API PRODUCTOS =====
+app.get("/productos", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM productos ORDER BY id");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
+app.get("/productos/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await db.query("SELECT * FROM productos WHERE id=$1", [id]);
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Producto no encontrado" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al obtener producto" });
+  }
+});
+
+app.post("/productos", async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, categoria, img } = req.body;
+    if (!nombre || !categoria || isNaN(precio))
+      return res.status(400).json({ error: "Nombre, categoría y precio válido son obligatorios" });
+
+    const result = await db.query(
+      "INSERT INTO productos (nombre, descripcion, precio, categoria, img) VALUES ($1,$2,$3,$4,$5) RETURNING *",
+      [nombre, descripcion || "", precio, categoria, img || ""]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al crear producto" });
+  }
+});
+
+app.put("/productos/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { nombre, descripcion, precio, categoria, img } = req.body;
+
+    const result = await db.query(
+      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, categoria=$4, img=$5 WHERE id=$6 RETURNING *",
+      [nombre, descripcion || "", precio, categoria, img || "", id]
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Producto no encontrado" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar producto" });
+  }
+});
+
+app.delete("/productos/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await db.query("DELETE FROM productos WHERE id=$1 RETURNING *", [id]);
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Producto no encontrado" });
+    res.json({ message: "Producto eliminado" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar producto" });
+  }
+});
+
+// ===== RUTAS API PEDIDOS =====
+app.get("/pedidos", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        p.id AS pedido_id,
+        c.nombre AS cliente,
+        TO_CHAR(p.fecha, 'YYYY-MM-DD HH24:MI') AS fecha,
+        STRING_AGG(pr.nombre || ' (x' || pp.cantidad || ')', ', ') AS productos,
+        SUM(pp.cantidad * pr.precio) AS total,
+        COALESCE(p.estado, 'En preparación') AS estado,
+        p.direccion,
+        p.telefono,
+        p.alergenos,
+        p.comentario
+      FROM pedido_productos pp
+      JOIN pedidos p ON pp.pedido_id = p.id
+      JOIN clientes c ON p.cliente_id = c.id
+      JOIN productos pr ON pp.producto_id = pr.id
+      GROUP BY p.id, c.nombre, p.fecha, p.estado, p.direccion, p.telefono, p.alergenos, p.comentario
+      ORDER BY p.id DESC;
+    `);
+
+    const pedidos = result.rows.map(p => ({
+      ...p,
+      estado: p.estado || "En preparación"
+    }));
+
+    res.json(pedidos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar pedidos" });
+  }
+});
+
+// 🆕 POST /pedidos - Crear nuevo pedido
+app.post("/pedidos", async (req, res) => {
+  const client = await db.connect();
+  
+  try {
+    const { cliente_id, productos, alergenos, comentario, direccion, telefono } = req.body;
+    
+    // Validaciones
+    if (!cliente_id || !productos || productos.length === 0) {
+      return res.status(400).json({ error: "cliente_id y productos son obligatorios" });
+    }
+    
+    if (!direccion || !telefono) {
+      return res.status(400).json({ error: "dirección y teléfono son obligatorios" });
+    }
+    
+    await client.query("BEGIN");
+    
+    // 1. Crear el pedido principal
+    const pedidoResult = await client.query(
+      `INSERT INTO pedidos (cliente_id, fecha, estado, direccion, telefono, alergenos, comentario) 
+       VALUES ($1, NOW(), $2, $3, $4, $5, $6) 
+       RETURNING id`,
+      [cliente_id, "En preparación", direccion, telefono, alergenos || null, comentario || null]
+    );
+    
+    const pedido_id = pedidoResult.rows[0].id;
+    
+    // 2. Insertar los productos del pedido
+    for (const item of productos) {
+      await client.query(
+        "INSERT INTO pedido_productos (pedido_id, producto_id, cantidad) VALUES ($1, $2, $3)",
+        [pedido_id, item.producto_id, item.cantidad]
+      );
+    }
+    
+    await client.query("COMMIT");
+    
+    res.status(201).json({
+      message: "Pedido creado exitosamente",
+      pedido_id: pedido_id
+    });
+    
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error al crear pedido:", err);
+    res.status(500).json({ error: "Error al crear el pedido" });
+  } finally {
+    client.release();
+  }
+});
+
+// PUT /pedidos/:id/estado - Actualizar estado del pedido
+app.put("/pedidos/:id/estado", async (req, res) => {
+  try {
+    const pedido_id = req.params.id;
+    const { estado } = req.body;
+    
+    if (!estado)
+      return res.status(400).json({ error: "Debes indicar el nuevo estado" });
+
+    const result = await db.query(
+      "UPDATE pedidos SET estado=$1 WHERE id=$2 RETURNING *",
+      [estado, pedido_id]
+    );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Pedido no encontrado" });
+
+    res.json({ message: "Estado actualizado", pedido: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar el estado" });
+  }
+});
+
+// ===== RUTAS API CLIENTES =====
+app.get("/clientes", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM clientes ORDER BY id");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar clientes" });
+  }
+});
+
+// ===== CONFIGURACIÓN SERVIDOR =====
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`📱 Accede desde tu red local usando tu IP`);
+});

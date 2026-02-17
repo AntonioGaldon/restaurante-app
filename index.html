@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Restaurante App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    button { padding: 5px 10px; }
+    select, input { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Pedidos del Restaurante</h1>
+
+  <h2>Crear nuevo pedido</h2>
+  <form id="pedidoForm">
+    Cliente:
+    <select id="cliente_id" required></select><br>
+
+    Productos:
+    <div id="productosContainer"></div>
+
+    <button type="submit">Crear Pedido</button>
+  </form>
+
+  <h2>Listado de pedidos</h2>
+  <table id="pedidosTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Fecha</th>
+        <th>Productos</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API_URL = "http://localhost:5000";
+    let productosDisponibles = [];
+
+    // Cargar clientes y productos
+    async function cargarClientesProductos() {
+      const clientesRes = await fetch(`${API_URL}/clientes`);
+      const clientes = await clientesRes.json();
+      const clienteSelect = document.querySelector("#cliente_id");
+      clienteSelect.innerHTML = clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
+
+      const productosRes = await fetch(`${API_URL}/productos`);
+      productosDisponibles = await productosRes.json();
+      const cont = document.querySelector("#productosContainer");
+      cont.innerHTML = productosDisponibles.map(p => `
+        <label>
+          ${p.nombre} ($${p.precio}):
+          <input type="number" min="0" value="0" data-id="${p.id}">
+        </label><br>
+      `).join("");
+    }
+
+    // Función para cargar pedidos
+    async function cargarPedidos() {
+      const res = await fetch(`${API_URL}/pedidos`);
+      const pedidos = await res.json();
+      const tbody = document.querySelector("#pedidosTable tbody");
+      tbody.innerHTML = "";
+      pedidos.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${p.pedido_id}</td>
+          <td>${p.cliente}</td>
+          <td>${p.fecha}</td>
+          <td>${p.productos}</td>
+          <td>${p.total}</td>
+          <td id="estado-${p.pedido_id}">${p.estado || "pendiente"}</td>
+          <td><button onclick="actualizarEstado(${p.pedido_id})">Entregar</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Actualizar estado
+    async function actualizarEstado(id) {
+      const res = await fetch(`${API_URL}/pedidos/${id}/estado`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: "entregado" })
+      });
+      if (res.ok) {
+        document.querySelector(`#estado-${id}`).textContent = "entregado";
+        alert("Estado actualizado correctamente");
+      } else {
+        alert("Error al actualizar el estado");
+      }
+    }
+
+    // Crear nuevo pedido
+    document.querySelector("#pedidoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const cliente_id = document.querySelector("#cliente_id").value;
+
+      const productos = Array.from(document.querySelectorAll("#productosContainer input"))
+        .filter(input => parseInt(input.value) > 0)
+        .map(input => ({ producto_id: parseInt(input.dataset.id), cantidad: parseInt(input.value) }));
+
+      if (!productos.length) {
+        alert("Selecciona al menos un producto con cantidad mayor a 0");
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/pedidos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cliente_id, productos })
+      });
+
+      if (res.ok) {
+        alert("Pedido creado");
+        cargarPedidos();
+        document.querySelector("#pedidoForm").reset();
+      } else {
+        alert("Error al crear el pedido");
+      }
+    });
+
+    // Inicializar
+    cargarClientesProductos();
+    cargarPedidos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+:root {
+  --marron: #4a2e1f;
+  --rojo: #d6451b;
+  --rojo-oscuro: #b73715;
+  --dorado: #f2b705;
+  --fondo: #fdf6f0;
+  --gris-suave: #f4f4f4;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--fondo);
+  color: var(--marron);
+  padding: 0 16px;
+}
+
+h1 { text-align: center; color: var(--rojo); }
+
+button {
+  cursor: pointer;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+#btnBack, #btnRestaurante {
+  display: inline-block;
+  margin: 10px 5px;
+  padding: 8px 16px;
+  background: var(--rojo);
+  color: white;
+}
+
+#btnBack:active, #btnRestaurante:active {
+  background: var(--rojo-oscuro);
+}
+
+form {
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  max-width: 600px;
+  margin: 0 auto 20px auto;
+}
+
+form label { display: block; margin-top: 12px; font-weight: 600; }
+
+form input, form textarea, form select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+form textarea { resize: vertical; }
+
+form button {
+  margin-top: 16px;
+  padding: 10px;
+  width: 100%;
+  background: var(--rojo);
+  color: white;
+}
+
+form button:active { background: var(--rojo-oscuro); }
+
+.cancel-btn { background: #ccc; }
+.cancel-btn:active { background: #aaa; }
+
+ul {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+}
+
+ul li {
+  background: white;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ul li button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+}
+
+ul li button.edit { background: var(--dorado); }
+ul li button.edit:active { background: #d0a904; }
+
+ul li button.delete { background: var(--rojo); color: white; }
+ul li button.delete:active { background: var(--rojo-oscuro); }
+
+@media (max-width: 600px) { form, ul { width: 100%; padding: 0 8px; } }

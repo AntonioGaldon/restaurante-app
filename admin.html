@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Panel de Administración</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<button id="btnBack">← Volver a la Carta</button>
+<button id="btnRestaurante">📋 Ver Pedidos Restaurante</button>
+
+<h1>Panel de Administración</h1>
+
+<form id="productoForm">
+  <input type="hidden" id="productoId">
+
+  <label for="nombre">Nombre</label>
+  <input type="text" id="nombre" placeholder="Nombre del producto" required>
+
+  <label for="descripcion">Descripción</label>
+  <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
+
+  <label for="precio">Precio (€)</label>
+  <input type="number" id="precio" step="0.01" placeholder="0.00" required>
+
+  <label for="categoria">Categoría</label>
+  <select id="categoria" required>
+    <option value="">-- Selecciona una categoría --</option>
+    <option value="Entrantes">Entrantes</option>
+    <option value="Platos principales">Platos principales</option>
+    <option value="Postres">Postres</option>
+    <option value="Bebidas">Bebidas</option>
+  </select>
+
+  <label for="img">URL de la imagen</label>
+  <input type="text" id="img" placeholder="https://">
+
+  <button type="submit">Guardar Producto</button>
+  <button type="button" id="cancelarEdicion" class="cancel-btn">Cancelar</button>
+</form>
+
+<ul id="listaProductos"></ul>
+
+<script src="admin.js"></script>
+<script>
+  document.getElementById("btnBack").addEventListener("click", () => {
+    window.location.href = "carta.html";
+  });
+
+  document.getElementById("btnRestaurante").addEventListener("click", () => {
+    window.location.href = "restaurante.html";
+  });
+</script>
+
+</body>
+</html>
