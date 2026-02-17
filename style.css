@@ -373,6 +373,128 @@ header h1 {
 }
 
 /* ============================= */
+/* UPSELL MODAL */
+/* ============================= */
+
+.upsell-modal-content {
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.upsell-subtitulo {
+  color: #888;
+  font-size: 14px;
+  margin: -8px 0 16px 0;
+}
+
+.upsell-productos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.upsell-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.upsell-card img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.upsell-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upsell-nombre {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.upsell-precio {
+  color: #ff6b35;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.upsell-acciones {
+  flex-shrink: 0;
+}
+
+.upsell-agregar-btn {
+  background: #ff6b35;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.upsell-agregar-btn:hover {
+  background: #e85a2b;
+}
+
+.upsell-contador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upsell-contador button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #ff6b35;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.upsell-contador span {
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+#saltarUpsell {
+  background: transparent;
+  border: 2px solid #ddd;
+  color: #555;
+}
+
+#saltarUpsell:hover {
+  background: #f1f1f1;
+}
+
+#continuarUpsell {
+  background: linear-gradient(135deg, #ff6b35, #ff8c42);
+  color: white;
+  box-shadow: 0 6px 15px rgba(255,107,53,0.3);
+}
+
+#continuarUpsell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255,107,53,0.4);
+}
+
+/* ============================= */
 /* ANIMACIONES */
 /* ============================= */
 
@@ -403,7 +525,6 @@ header h1 {
     padding-bottom: 30px;
   }
 
-
   .modal {
     align-items: flex-end;
   }
@@ -416,8 +537,16 @@ header h1 {
     overflow-y: auto;
   }
 
+  .upsell-modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+  }
+
   @keyframes slideUp {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
   }
 }
+
