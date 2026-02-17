@@ -32,8 +32,12 @@ app.get("/service-worker.js", (req, res) => res.sendFile(path.join(__dirname, "s
 
 // IMÁGENES
 app.get("/img/:filename", (req, res) => {
-  res.sendFile(path.join(__dirname, "img", req.params.filename));
+  const filePath = path.join(__dirname, "img", req.params.filename);
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).json({ error: "Imagen no encontrada" });
+  });
 });
+
 
 // ===== RUTAS API PRODUCTOS =====
 app.get("/productos", async (req, res) => {
