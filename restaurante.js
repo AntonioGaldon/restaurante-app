@@ -104,3 +104,8 @@ async function actualizarEstado(pedidoId, nuevoEstado) {
 // INICIALIZAR
 // -----------------------------
 cargarPedidos();
+
+// Auto-actualización cada 5 segundos
+setInterval(() => {
+  cargarPedidos();
+}, 5000);
