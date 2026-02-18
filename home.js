@@ -45,3 +45,44 @@ searchInput.addEventListener('input', (e) => {
 
 renderCategories();
 
+// =============================
+// PROMOCIONES
+// =============================
+const promosGrid = document.getElementById('promosGrid');
+
+async function cargarPromociones() {
+  try {
+    const response = await fetch(`${window.location.origin}/promociones`);
+    const promos = await response.json();
+    
+    if (promos.length === 0) {
+      promosGrid.innerHTML = '<p style="text-align:center; color:#999;">No hay promociones activas</p>';
+      return;
+    }
+    
+    promosGrid.innerHTML = '';
+    promos.forEach(promo => {
+      const card = document.createElement('div');
+      card.className = 'promo-card';
+      card.onclick = () => {
+        // Guardar promo en localStorage para añadirla al carrito
+        localStorage.setItem('promoSeleccionada', JSON.stringify(promo));
+        window.location.href = 'carta.html';
+      };
+      
+      card.innerHTML = `
+        <img src="${promo.imagen || 'https://via.placeholder.com/280x150?text=Promo'}" alt="${promo.titulo}">
+        <div class="promo-titulo">${promo.titulo}</div>
+        <div class="promo-descripcion">${promo.descripcion || ''}</div>
+        <div class="promo-precio">${parseFloat(promo.precio).toFixed(2)} €</div>
+      `;
+      
+      promosGrid.appendChild(card);
+    });
+  } catch (error) {
+    console.error('Error cargando promociones:', error);
+    promosGrid.innerHTML = '<p style="text-align:center; color:#999;">Error al cargar promociones</p>';
+  }
+}
+
+cargarPromociones();
