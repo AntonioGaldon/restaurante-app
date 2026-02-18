@@ -237,6 +237,88 @@ app.get("/clientes", async (req, res) => {
   }
 });
 
+// ===== RUTAS API PROMOCIONES =====
+app.get("/promociones", async (req, res) => {
+  try {
+    const mostrarTodas = req.query.all === 'true';
+    const query = mostrarTodas 
+      ? "SELECT * FROM promociones ORDER BY id DESC"
+      : "SELECT * FROM promociones WHERE activa = true ORDER BY id DESC";
+    const result = await db.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar promociones" });
+  }
+});
+
+app.post("/promociones", async (req, res) => {
+  try {
+    const { titulo, descripcion, precio, imagen, activa } = req.body;
+    if (!titulo || !precio) {
+      return res.status(400).json({ error: "Título y precio son obligatorios" });
+    }
+    const result = await db.query(
+      "INSERT INTO promociones (titulo, descripcion, precio, imagen, activa) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [titulo, descripcion || "", precio, imagen || "", activa !== false]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al crear promoción" });
+  }
+});
+
+app.put("/promociones/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion, precio, imagen, activa } = req.body;
+    const result = await db.query(
+      "UPDATE promociones SET titulo=$1, descripcion=$2, precio=$3, imagen=$4, activa=$5 WHERE id=$6 RETURNING *",
+      [titulo, descripcion, precio, imagen, activa, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Promoción no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar promoción" });
+  }
+});
+
+app.delete("/promociones/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query("DELETE FROM promociones WHERE id=$1 RETURNING *", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Promoción no encontrada" });
+    }
+    res.json({ message: "Promoción eliminada" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar promoción" });
+  }
+});
+
+app.put("/promociones/:id/toggle", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "UPDATE promociones SET activa = NOT activa WHERE id=$1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Promoción no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cambiar estado" });
+  }
+});
+
+
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
