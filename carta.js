@@ -65,13 +65,17 @@ function generarFiltros() {
     btn.textContent = cat;
     if (cat === "Todas") btn.classList.add("active");
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".filtros button").forEach(b => b.classList.remove("active"));
+      // Quitar active de todos los botones de filtros
+      const botonesActivos = filtrosContainer.querySelectorAll("button");
+      botonesActivos.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       renderProductos(cat);
     });
     filtrosContainer.appendChild(btn);
   });
 }
+
+
 
 // =============================
 // 🔹 RENDER PRODUCTOS
