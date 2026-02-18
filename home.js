@@ -86,3 +86,8 @@ async function cargarPromociones() {
 }
 
 cargarPromociones();
+
+// Auto-actualización cada 10 segundos
+setInterval(() => {
+  cargarPromociones();
+}, 10000);
