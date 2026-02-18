@@ -298,3 +298,11 @@ window.eliminarPromo = async function(id) {
 // ============================= 
 
 cargarProductos();
+
+// Auto-actualización según pestaña activa
+setInterval(() => {
+  const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+  if (activeTab === 'productos') cargarProductos();
+  if (activeTab === 'promociones') cargarPromociones();
+}, 8000);
+
