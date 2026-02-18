@@ -11,6 +11,7 @@ let carrito = [];
 const productosContainer = document.getElementById("productosContainer");
 const carritoItems = document.getElementById("carritoItems");
 const totalCarrito = document.getElementById("totalCarrito");
+const totalCarritoFloat = document.getElementById("totalCarritoFloat");
 const finalizarPedido = document.getElementById("finalizarPedido");
 const filtrosContainer = document.getElementById("filtros");
 
@@ -31,6 +32,7 @@ const btnContinuarUpsell = document.getElementById("continuarUpsell");
 // Botón flotante y contador
 const carritoFlotante = document.getElementById("carritoFlotante");
 const cantidadCarritoBtn = document.getElementById("cantidadCarrito");
+const carritoSheet = document.getElementById("carritoSheet");
 
 // =============================
 // 🔹 CARGAR PRODUCTOS DESDE API
@@ -42,7 +44,7 @@ async function cargarProductosDesdeAPI() {
     productos = await response.json();
     
     if (productos.length === 0) {
-      productosContainer.innerHTML = "<p style='text-align:center; padding:40px;'>No hay productos disponibles.</p>";
+      productosContainer.innerHTML = "<p class='loading'>No hay productos disponibles.</p>";
       return;
     }
     
@@ -50,7 +52,7 @@ async function cargarProductosDesdeAPI() {
     renderProductos();
   } catch (error) {
     console.error("Error cargando productos:", error);
-    productosContainer.innerHTML = "<p style='text-align:center; padding:40px; color:red;'>Error al cargar productos. Verifica que el servidor esté corriendo.</p>";
+    productosContainer.innerHTML = "<p class='loading' style='color:red;'>Error al cargar productos.</p>";
   }
 }
 
@@ -65,7 +67,6 @@ function generarFiltros() {
     btn.textContent = cat;
     if (cat === "Todas") btn.classList.add("active");
     btn.addEventListener("click", () => {
-      // Quitar active de todos los botones de filtros
       const botonesActivos = filtrosContainer.querySelectorAll("button");
       botonesActivos.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -75,8 +76,6 @@ function generarFiltros() {
   });
 }
 
-
-
 // =============================
 // 🔹 RENDER PRODUCTOS
 // =============================
@@ -85,16 +84,16 @@ function renderProductos(categoria = "Todas") {
   const filtrados = categoria === "Todas" ? productos : productos.filter(p => p.categoria === categoria);
   
   if (filtrados.length === 0) {
-    productosContainer.innerHTML = "<p style='text-align:center; padding:40px;'>No hay productos en esta categoría.</p>";
+    productosContainer.innerHTML = "<p class='loading'>No hay productos en esta categoría.</p>";
     return;
   }
   
   filtrados.forEach(p => {
     const card = document.createElement("div");
     card.classList.add("card");
-    const imgUrl = p.img || "https://via.placeholder.com/400x300?text=Sin+Imagen";
+    const imgUrl = p.img || "https://via.placeholder.com/100x100?text=Sin+Imagen";
     card.innerHTML = `
-      <img src="${imgUrl}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">
+      <img src="${imgUrl}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/100x100?text=Sin+Imagen'">
       <div class="card-content">
         <div>
           <h3>${p.nombre}</h3>
@@ -168,17 +167,48 @@ function quitarDelCarrito(id) {
 function renderCarrito() {
   carritoItems.innerHTML = "";
   let total = 0;
+  
   carrito.forEach(i => {
     const li = document.createElement("li");
-    li.textContent = `${i.nombre} x${i.cantidad} - ${(i.precio * i.cantidad).toFixed(2)} €`;
+    li.innerHTML = `
+      <span>${i.nombre} x${i.cantidad}</span>
+      <span>${(i.precio * i.cantidad).toFixed(2)} €</span>
+    `;
     carritoItems.appendChild(li);
     total += i.precio * i.cantidad;
   });
-  totalCarrito.textContent = total.toFixed(2);
-  finalizarPedido.style.display = carrito.length > 0 ? "block" : "none";
+  
+  totalCarrito.textContent = `${total.toFixed(2)} €`;
+  if (totalCarritoFloat) {
+    totalCarritoFloat.textContent = `${total.toFixed(2)} €`;
+  }
+  
+  if (carritoFlotante) {
+    if (carrito.length > 0) {
+      carritoFlotante.style.display = "flex";
+    } else {
+      carritoFlotante.style.display = "none";
+    }
+  }
+  
   if (cantidadCarritoBtn) {
     cantidadCarritoBtn.textContent = carrito.reduce((sum, i) => sum + i.cantidad, 0);
   }
+}
+
+// =============================
+// 🔹 BOTÓN FLOTANTE CARRITO
+// =============================
+if (carritoFlotante) {
+  carritoFlotante.addEventListener("click", () => {
+    carritoSheet.classList.add("show");
+  });
+}
+
+if (carritoSheet) {
+  carritoSheet.querySelector(".sheet-overlay").addEventListener("click", () => {
+    carritoSheet.classList.remove("show");
+  });
 }
 
 // =============================
@@ -203,7 +233,7 @@ function mostrarUpsell() {
     const div = document.createElement("div");
     div.classList.add("upsell-card");
     div.innerHTML = `
-      <img src="${p.img || 'https://via.placeholder.com/80'}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/80'">
+      <img src="${p.img || 'https://via.placeholder.com/60'}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/60'">
       <div class="upsell-info">
         <span class="upsell-nombre">${p.nombre}</span>
         <span class="upsell-precio">${parseFloat(p.precio).toFixed(2)} €</span>
@@ -234,6 +264,7 @@ function mostrarUpsell() {
   });
 
   upsellModal.classList.add("show");
+  carritoSheet.classList.remove("show");
 }
 
 function actualizarUpsellContador(div, productoId) {
@@ -268,6 +299,7 @@ btnContinuarUpsell.addEventListener("click", () => {
 // =============================
 finalizarPedido.addEventListener("click", () => {
   if (carrito.length === 0) return;
+  carritoSheet.classList.remove("show");
   mostrarUpsell();
 });
 
@@ -300,7 +332,7 @@ confirmarPedido.addEventListener("click", async () => {
       body: JSON.stringify(pedidoData)
     });
     if (!response.ok) throw new Error("Error al crear el pedido");
-    alert("¡Pedido realizado con éxito! ✅\n\nTu pedido ha sido enviado al restaurante.");
+    alert("¡Pedido realizado con éxito! ✅");
     carrito = [];
     renderCarrito();
     pedidoModal.classList.remove("show");
@@ -314,15 +346,6 @@ confirmarPedido.addEventListener("click", async () => {
     alert("Error al realizar el pedido. Por favor, intenta de nuevo.");
   }
 });
-
-// =============================
-// 🔹 BOTÓN FLOTANTE CARRITO
-// =============================
-if (carritoFlotante) {
-  carritoFlotante.addEventListener("click", () => {
-    document.querySelector(".carrito").classList.toggle("show");
-  });
-}
 
 // =============================
 // 🔹 BOTÓN ADMIN
@@ -339,4 +362,3 @@ if (btnAdmin) {
 // =============================
 cargarProductosDesdeAPI();
 renderCarrito();
-
