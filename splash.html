@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Fogón</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #ff6b35 0%, #e85a2b 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      animation: pulse 2s ease-in-out infinite;
+      margin-bottom: 30px;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+    }
+    
+    .brand {
+      color: white;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      animation: fadeIn 1s ease;
+    }
+    
+    .tagline {
+      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 50px;
+      animation: fadeIn 1.5s ease;
+    }
+    
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <img src="img/logo.png" alt="El Fogón" class="logo" onerror="this.style.display='none'">
+  <div class="brand">El Fogón</div>
+  <div class="tagline">La Cocina de la Sierra</div>
+  <div class="loader"></div>
+  
+  <script>
+    // Redirigir al home después de 2 segundos
+    setTimeout(() => {
+      window.location.href = 'home.html';
+    }, 2000);
+    
+    // Si el logo no carga, mostrar emoji
+    document.querySelector('.logo').addEventListener('error', function() {
+      this.style.display = 'none';
+      const emoji = document.createElement('div');
+      emoji.textContent = '🍽️';
+      emoji.style.fontSize = '80px';
+      emoji.style.marginBottom = '30px';
+      document.body.insertBefore(emoji, document.querySelector('.brand'));
+    });
+  </script>
+</body>
+</html>
