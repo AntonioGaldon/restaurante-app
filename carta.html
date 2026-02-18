@@ -3,103 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4a2e1f">
-  <meta name="description" content="Pedido de comida para llevar - El Fogón">
-  <title>Carta del Restaurante - El Fogón</title>
-  
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="El Fogón">
-  
+  <meta name="theme-color" content="#ff6b35">
+  <title>Productos - El Fogón</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <div class="header-top">
-    <img src="img/logo.png" alt="Logo El Fogón" class="logo" onerror="this.style.display='none'">
-  </div>
-  <h1>El Fogón - La Cocina de la Sierra</h1>
-  <div id="filtros" class="filtros"></div>
-  <button id="btnAdmin" class="btn-admin">Admin</button>
+<!-- HEADER -->
+<header class="product-header">
+  <button class="back-btn" onclick="window.location.href='/'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
+  <h1 id="categoryTitle">Productos</h1>
+  <button class="icon-btn" id="btnAdmin">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 1v6m0 6v6"/>
+    </svg>
+  </button>
 </header>
 
-<main>
-  <div id="productosContainer" class="productos-container">
-    <p style="text-align:center; padding:40px;">Cargando productos...</p>
+<!-- FILTROS -->
+<div class="filters-container" id="filtros">
+  <!-- Generado por JS -->
+</div>
+
+<!-- PRODUCTOS -->
+<main class="products-main">
+  <div id="productosContainer" class="products-grid">
+    <p class="loading">Cargando productos...</p>
   </div>
 </main>
 
-<aside class="carrito">
-  <h2>Carrito</h2>
-  <ul id="carritoItems"></ul>
-  <p>Total: <span id="totalCarrito">0.00</span> €</p>
-  <button id="finalizarPedido" style="display:none;">Realizar Pedido</button>
-</aside>
+<!-- CARRITO FLOTANTE -->
+<button id="carritoFlotante" class="cart-float" style="display:none;">
+  <div class="cart-info">
+    <span class="cart-count" id="cantidadCarrito">0</span>
+    <span class="cart-text">Ver carrito</span>
+  </div>
+  <span class="cart-price" id="totalCarritoFloat">0,00 €</span>
+</button>
 
-<!-- ========================= -->
+<!-- BOTTOM SHEET CARRITO -->
+<div id="carritoSheet" class="bottom-sheet">
+  <div class="sheet-overlay"></div>
+  <div class="sheet-content">
+    <div class="sheet-handle"></div>
+    <h2>Tu pedido</h2>
+    <ul id="carritoItems" class="cart-items"></ul>
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="totalCarrito" class="total-price">0,00 €</span>
+    </div>
+    <button id="finalizarPedido" class="btn-primary">Realizar pedido</button>
+  </div>
+</div>
+
 <!-- MODAL UPSELL -->
-<!-- ========================= -->
 <div id="upsellModal" class="modal">
   <div class="modal-content upsell-modal-content">
-    <h3>¿Quieres añadir algo más?</h3>
-    <p class="upsell-subtitulo">Completa tu pedido con estos productos</p>
-    <div id="upsellProductos" class="upsell-productos"></div>
+    <h3>¿Algo más?</h3>
+    <p class="modal-subtitle">Completa tu pedido</p>
+    <div id="upsellProductos" class="upsell-grid"></div>
     <div class="modal-buttons">
-      <button id="saltarUpsell">Saltar</button>
-      <button id="continuarUpsell">Continuar con el pedido →</button>
+      <button id="saltarUpsell" class="btn-secondary">Saltar</button>
+      <button id="continuarUpsell" class="btn-primary">Continuar →</button>
     </div>
   </div>
 </div>
 
-<!-- ========================= -->
-<!-- MODAL CONFIRMAR PEDIDO -->
-<!-- ========================= -->
+<!-- MODAL PEDIDO -->
 <div id="pedidoModal" class="modal">
   <div class="modal-content">
-    <h3>Confirmar Pedido</h3>
-
+    <h3>Confirmar pedido</h3>
     <label>Comentarios sobre alérgenos</label>
     <textarea id="alergenos" placeholder="Opcional"></textarea>
-
-    <label>Comentario sobre el pedido</label>
+    <label>Comentarios del pedido</label>
     <textarea id="comentarioPedido" placeholder="Opcional"></textarea>
-
     <label>Dirección de entrega *</label>
-    <input type="text" id="direccionEntrega" placeholder="Calle y número" required>
-
+    <input type="text" id="direccionEntrega" placeholder="C/ Principal, 123" required>
     <label>Teléfono de contacto *</label>
-    <input type="tel" id="telefonoContacto" placeholder="Teléfono" required>
-
+    <input type="tel" id="telefonoContacto" placeholder="600 123 456" required>
     <div class="modal-buttons">
-      <button id="cancelarPedido">Cancelar</button>
-      <button id="confirmarPedido">Confirmar Pedido</button>
+      <button id="cancelarPedido" class="btn-secondary">Cancelar</button>
+      <button id="confirmarPedido" class="btn-primary">Confirmar pedido</button>
     </div>
   </div>
 </div>
-
-<!-- Botón flotante carrito -->
-<button id="carritoFlotante" class="carrito-flotante">
-  🛒 <span id="cantidadCarrito">0</span>
-</button>
 
 <script src="carta.js"></script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
-          console.log('✅ Service Worker registrado:', registration);
-        })
-        .catch(error => {
-          console.log('❌ Error al registrar Service Worker:', error);
-        });
-    });
-  }
-</script>
-
 </body>
 </html>
+
