@@ -15,7 +15,11 @@ body {
   padding: 0 16px;
 }
 
-h1 { text-align: center; color: var(--rojo); }
+h1 { 
+  text-align: center; 
+  color: var(--rojo); 
+  margin-bottom: 10px;
+}
 
 button {
   cursor: pointer;
@@ -28,7 +32,7 @@ button {
 #btnBack, #btnRestaurante {
   display: inline-block;
   margin: 10px 5px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: var(--rojo);
   color: white;
 }
@@ -37,40 +41,113 @@ button {
   background: var(--rojo-oscuro);
 }
 
+/* ============================= */
+/* PESTAÑAS */
+/* ============================= */
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  background: white;
+  color: var(--marron);
+  border: 2px solid #e0e0e0;
+  font-size: 15px;
+}
+
+.tab-btn.active {
+  background: var(--rojo);
+  color: white;
+  border-color: var(--rojo);
+}
+
+.tab-btn:active {
+  transform: scale(0.98);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================= */
+/* FORMULARIOS */
+/* ============================= */
+
 form {
   background: white;
-  padding: 16px;
+  padding: 20px;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   max-width: 600px;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 30px auto;
 }
 
-form label { display: block; margin-top: 12px; font-weight: 600; }
+form label { 
+  display: block; 
+  margin-top: 12px; 
+  font-weight: 600; 
+}
 
 form input, form textarea, form select {
   width: 100%;
-  padding: 8px 10px;
-  margin-top: 4px;
+  padding: 10px;
+  margin-top: 6px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 
-form textarea { resize: vertical; }
+form textarea { 
+  resize: vertical; 
+  min-height: 80px;
+}
+
+form input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
 
 form button {
-  margin-top: 16px;
-  padding: 10px;
+  margin-top: 20px;
+  padding: 12px;
   width: 100%;
   background: var(--rojo);
   color: white;
+  font-size: 16px;
 }
 
-form button:active { background: var(--rojo-oscuro); }
+form button:active { 
+  background: var(--rojo-oscuro); 
+}
 
-.cancel-btn { background: #ccc; }
-.cancel-btn:active { background: #aaa; }
+.cancel-btn { 
+  background: #ccc; 
+  margin-top: 10px;
+}
+
+.cancel-btn:active { 
+  background: #aaa; 
+}
+
+/* ============================= */
+/* LISTAS */
+/* ============================= */
 
 ul {
   list-style: none;
@@ -81,25 +158,81 @@ ul {
 
 ul li {
   background: white;
-  padding: 12px 16px;
-  margin-bottom: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+ul li .item-info {
+  margin-bottom: 12px;
+}
+
+ul li .item-info strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+ul li .item-info span {
+  color: #666;
+  font-size: 14px;
+}
+
+ul li .item-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 ul li button {
-  margin-left: 8px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-weight: bold;
+  font-size: 14px;
 }
 
-ul li button.edit { background: var(--dorado); }
-ul li button.edit:active { background: #d0a904; }
+ul li button.edit { 
+  background: var(--dorado); 
+}
 
-ul li button.delete { background: var(--rojo); color: white; }
-ul li button.delete:active { background: var(--rojo-oscuro); }
+ul li button.edit:active { 
+  background: #d0a904; 
+}
 
-@media (max-width: 600px) { form, ul { width: 100%; padding: 0 8px; } }
+ul li button.delete { 
+  background: var(--rojo); 
+  color: white; 
+}
+
+ul li button.delete:active { 
+  background: var(--rojo-oscuro); 
+}
+
+ul li button.toggle {
+  background: #4CAF50;
+  color: white;
+}
+
+ul li button.toggle.inactive {
+  background: #999;
+}
+
+ul li button.toggle:active {
+  opacity: 0.8;
+}
+
+@media (max-width: 600px) { 
+  form, ul { 
+    width: 100%; 
+    padding: 0 8px; 
+  }
+  
+  .tabs {
+    gap: 5px;
+  }
+  
+  .tab-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
