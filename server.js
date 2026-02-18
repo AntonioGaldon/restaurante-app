@@ -12,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // ===== RUTAS HTML =====
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "carta.html")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "home.html")));
 app.get("/carta.html", (req, res) => res.sendFile(path.join(__dirname, "carta.html")));
 app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
 app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
