@@ -339,3 +339,4 @@ if (btnAdmin) {
 // =============================
 cargarProductosDesdeAPI();
 renderCarrito();
+
