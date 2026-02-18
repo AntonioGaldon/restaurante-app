@@ -8,51 +8,83 @@
 </head>
 <body>
 
-<button id="btnBack">← Volver a la Carta</button>
-<button id="btnRestaurante">📋 Ver Pedidos Restaurante</button>
+<button id="btnBack">← Volver al Inicio</button>
 
 <h1>Panel de Administración</h1>
 
-<form id="productoForm">
-  <input type="hidden" id="productoId">
+<!-- PESTAÑAS -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="productos">📦 Productos</button>
+  <button class="tab-btn" data-tab="promociones">🔥 Promociones</button>
+  <button class="tab-btn" data-tab="pedidos">📋 Pedidos</button>
+</div>
 
-  <label for="nombre">Nombre</label>
-  <input type="text" id="nombre" placeholder="Nombre del producto" required>
+<!-- CONTENIDO PRODUCTOS -->
+<div id="productos-tab" class="tab-content active">
+  <form id="productoForm">
+    <input type="hidden" id="productoId">
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre" placeholder="Nombre del producto" required>
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
+    <label for="precio">Precio (€)</label>
+    <input type="number" id="precio" step="0.01" placeholder="0.00" required>
+    <label for="categoria">Categoría</label>
+    <select id="categoria" required>
+      <option value="">-- Selecciona una categoría --</option>
+      <option value="Comida">Comida</option>
+      <option value="Snacks">Snacks</option>
+      <option value="Bebidas">Bebidas</option>
+      <option value="Bebidas Alcohólicas">Bebidas Alcohólicas</option>
+      <option value="Vapers">Vapers</option>
+      <option value="Parafarmacia">Parafarmacia</option>
+      <option value="Sexshop">Sexshop</option>
+      <option value="Butano y Propano">Butano y Propano</option>
+      <option value="Panadería">Panadería</option>
+      <option value="Higiene">Higiene</option>
+      <option value="Botiquín">Botiquín</option>
+      <option value="Hogar y Mascotas">Hogar y Mascotas</option>
+      <option value="Electrónica y Regalos">Electrónica y Regalos</option>
+      <option value="Helados">Helados</option>
+      <option value="Café e Infusiones">Café e Infusiones</option>
+      <option value="Encargos">Encargos</option>
+    </select>
+    <label for="img">URL de la imagen</label>
+    <input type="text" id="img" placeholder="https://">
+    <button type="submit">Guardar Producto</button>
+    <button type="button" id="cancelarEdicion" class="cancel-btn">Cancelar</button>
+  </form>
+  <ul id="listaProductos"></ul>
+</div>
 
-  <label for="descripcion">Descripción</label>
-  <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
+<!-- CONTENIDO PROMOCIONES -->
+<div id="promociones-tab" class="tab-content">
+  <form id="promoForm">
+    <input type="hidden" id="promoId">
+    <label for="promoTitulo">Título</label>
+    <input type="text" id="promoTitulo" placeholder="Título de la promoción" required>
+    <label for="promoDescripcion">Descripción</label>
+    <textarea id="promoDescripcion" placeholder="Descripción"></textarea>
+    <label for="promoPrecio">Precio (€)</label>
+    <input type="number" id="promoPrecio" step="0.01" placeholder="0.00" required>
+    <label for="promoImagen">URL de la imagen</label>
+    <input type="text" id="promoImagen" placeholder="https://">
+    <label>
+      <input type="checkbox" id="promoActiva" checked> Promoción activa
+    </label>
+    <button type="submit">Guardar Promoción</button>
+    <button type="button" id="cancelarPromo" class="cancel-btn">Cancelar</button>
+  </form>
+  <ul id="listaPromociones"></ul>
+</div>
 
-  <label for="precio">Precio (€)</label>
-  <input type="number" id="precio" step="0.01" placeholder="0.00" required>
-
-  <label for="categoria">Categoría</label>
-  <select id="categoria" required>
-    <option value="">-- Selecciona una categoría --</option>
-    <option value="Entrantes">Entrantes</option>
-    <option value="Platos principales">Platos principales</option>
-    <option value="Postres">Postres</option>
-    <option value="Bebidas">Bebidas</option>
-  </select>
-
-  <label for="img">URL de la imagen</label>
-  <input type="text" id="img" placeholder="https://">
-
-  <button type="submit">Guardar Producto</button>
-  <button type="button" id="cancelarEdicion" class="cancel-btn">Cancelar</button>
-</form>
-
-<ul id="listaProductos"></ul>
+<!-- CONTENIDO PEDIDOS -->
+<div id="pedidos-tab" class="tab-content">
+  <button id="btnRestaurante" style="width:100%; margin-bottom:20px;">Ver Panel de Pedidos →</button>
+  <p style="text-align:center; color:#999;">Gestión de pedidos disponible en el panel de restaurante</p>
+</div>
 
 <script src="admin.js"></script>
-<script>
-  document.getElementById("btnBack").addEventListener("click", () => {
-    window.location.href = "carta.html";
-  });
-
-  document.getElementById("btnRestaurante").addEventListener("click", () => {
-    window.location.href = "restaurante.html";
-  });
-</script>
 
 </body>
 </html>
