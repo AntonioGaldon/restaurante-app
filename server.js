@@ -24,6 +24,8 @@ app.get("/restaurante", (req, res) => res.sendFile(path.join(__dirname, "restaur
 // ===== ARCHIVOS ESTÁTICOS =====
 // CSS / JS
 app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "style.css")));
+app.get("/home-style.css", (req, res) => res.sendFile(path.join(__dirname, "home-style.css")));
+app.get("/home.js", (req, res) => res.sendFile(path.join(__dirname, "home.js")));
 app.get("/carta.js", (req, res) => res.sendFile(path.join(__dirname, "carta.js")));
 app.get("/admin.js", (req, res) => res.sendFile(path.join(__dirname, "admin.js")));
 app.get("/admin.css", (req, res) => res.sendFile(path.join(__dirname, "admin.css")));
