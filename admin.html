@@ -79,6 +79,26 @@
   <ul id="listaPromociones"></ul>
 </div>
 
+<!-- CONTENIDO CATEGORÍAS -->
+<div id="categorias-tab" class="tab-content">
+  <form id="categoriaForm">
+    <input type="hidden" id="categoriaId">
+    <label for="categoriaNombre">Nombre de la categoría *</label>
+    <input type="text" id="categoriaNombre" placeholder="Ej: Snacks" required>
+    <label for="categoriaIcono">Icono (emoji)</label>
+    <input type="text" id="categoriaIcono" placeholder="🍿" maxlength="10">
+    <label for="categoriaOrden">Orden de aparición</label>
+    <input type="number" id="categoriaOrden" placeholder="0" min="0">
+    <label>
+      <input type="checkbox" id="categoriaActiva" checked> Categoría activa
+    </label>
+    <button type="submit">Guardar Categoría</button>
+    <button type="button" id="cancelarCategoria" class="cancel-btn">Cancelar</button>
+  </form>
+  <ul id="listaCategorias"></ul>
+</div>
+
+
 <!-- CONTENIDO PEDIDOS -->
 <div id="pedidos-tab" class="tab-content">
   <button id="btnRestaurante" style="width:100%; margin-bottom:20px;">Ver Panel de Pedidos →</button>
