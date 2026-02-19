@@ -443,3 +443,5 @@ if (btnAdmin) {
 // =============================
 cargarProductosDesdeAPI();
 renderCarrito();
+
+// fix syntax error
