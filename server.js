@@ -326,6 +326,87 @@ app.put("/promociones/:id/toggle", async (req, res) => {
   }
 });
 
+// ===== RUTAS API CATEGORÍAS =====
+app.get("/categorias", async (req, res) => {
+  try {
+    const mostrarTodas = req.query.all === 'true';
+    const query = mostrarTodas 
+      ? "SELECT * FROM categorias ORDER BY orden, nombre"
+      : "SELECT * FROM categorias WHERE activa = true ORDER BY orden, nombre";
+    const result = await db.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar categorías" });
+  }
+});
+
+app.post("/categorias", async (req, res) => {
+  try {
+    const { nombre, icono, orden, activa } = req.body;
+    if (!nombre) {
+      return res.status(400).json({ error: "El nombre es obligatorio" });
+    }
+    const result = await db.query(
+      "INSERT INTO categorias (nombre, icono, orden, activa) VALUES ($1, $2, $3, $4) RETURNING *",
+      [nombre, icono || "📦", orden || 0, activa !== false]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al crear categoría" });
+  }
+});
+
+app.put("/categorias/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, icono, orden, activa } = req.body;
+    const result = await db.query(
+      "UPDATE categorias SET nombre=$1, icono=$2, orden=$3, activa=$4 WHERE id=$5 RETURNING *",
+      [nombre, icono, orden, activa, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Categoría no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar categoría" });
+  }
+});
+
+app.delete("/categorias/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query("DELETE FROM categorias WHERE id=$1 RETURNING *", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Categoría no encontrada" });
+    }
+    res.json({ message: "Categoría eliminada" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar categoría" });
+  }
+});
+
+app.put("/categorias/:id/toggle", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "UPDATE categorias SET activa = NOT activa WHERE id=$1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Categoría no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cambiar estado" });
+  }
+});
+
 
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
