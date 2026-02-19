@@ -48,8 +48,13 @@ async function cargarProductosDesdeAPI() {
       return;
     }
     
-    generarFiltros();
-    renderProductos();
+    await generarFiltros();
+
+// Cargar productos de la categoría si viene en la URL
+const urlParams = new URLSearchParams(window.location.search);
+const categoriaURL = urlParams.get('categoria');
+renderProductos(categoriaURL || "Todas", null);
+
   } catch (error) {
     console.error("Error cargando productos:", error);
     productosContainer.innerHTML = "<p class='loading' style='color:red;'>Error al cargar productos.</p>";
@@ -59,8 +64,54 @@ async function cargarProductosDesdeAPI() {
 // =============================
 // 🔹 GENERAR FILTROS
 // =============================
-function generarFiltros() {
+async function generarFiltros() {
   filtrosContainer.innerHTML = "";
+  
+  // Obtener categoría de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoriaURL = urlParams.get('categoria');
+  
+  if (categoriaURL) {
+    // Buscar el ID de la categoría
+    const resCat = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await resCat.json();
+    const categoria = categorias.find(c => c.nombre === categoriaURL);
+    
+    if (categoria) {
+      // Cargar subcategorías de esta categoría
+      const resSub = await fetch(`${API_URL}/subcategorias?categoria_id=${categoria.id}`);
+      const subcategorias = await resSub.json();
+      
+      if (subcategorias.length > 0) {
+        // Botón "Todas"
+        const btnTodas = document.createElement("button");
+        btnTodas.textContent = "Todas";
+        btnTodas.classList.add("active");
+        btnTodas.addEventListener("click", () => {
+          document.querySelectorAll("#filtros button").forEach(b => b.classList.remove("active"));
+          btnTodas.classList.add("active");
+          renderProductos(categoriaURL, null);
+        });
+        filtrosContainer.appendChild(btnTodas);
+        
+        // Botones de subcategorías
+        subcategorias.forEach(sub => {
+          const btn = document.createElement("button");
+          btn.textContent = sub.nombre;
+          btn.addEventListener("click", () => {
+            document.querySelectorAll("#filtros button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderProductos(categoriaURL, sub.id);
+          });
+          filtrosContainer.appendChild(btn);
+        });
+        
+        return;
+      }
+    }
+  }
+  
+  // Si no hay subcategorías, mostrar categorías normales
   const categorias = ["Todas", ...new Set(productos.map(p => p.categoria))];
   categorias.forEach(cat => {
     const btn = document.createElement("button");
@@ -70,18 +121,30 @@ function generarFiltros() {
       const botonesActivos = filtrosContainer.querySelectorAll("button");
       botonesActivos.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      renderProductos(cat);
+      renderProductos(cat, null);
     });
     filtrosContainer.appendChild(btn);
   });
 }
 
+
 // =============================
 // 🔹 RENDER PRODUCTOS
 // =============================
-function renderProductos(categoria = "Todas") {
+function renderProductos(categoria = "Todas", subcategoria_id = null) {
   productosContainer.innerHTML = "";
-  const filtrados = categoria === "Todas" ? productos : productos.filter(p => p.categoria === categoria);
+  
+  let filtrados = productos;
+  
+  // Filtrar por categoría
+  if (categoria !== "Todas") {
+    filtrados = filtrados.filter(p => p.categoria === categoria);
+  }
+  
+  // Filtrar por subcategoría si existe
+  if (subcategoria_id) {
+    filtrados = filtrados.filter(p => p.subcategoria_id === subcategoria_id);
+  }
   
   if (filtrados.length === 0) {
     productosContainer.innerHTML = "<p class='loading'>No hay productos en esta categoría.</p>";
@@ -114,6 +177,7 @@ function renderProductos(categoria = "Todas") {
     renderCardContador(card, p.id);
   });
 }
+
 
 // =============================
 // 🔹 CONTADOR EN CARD
