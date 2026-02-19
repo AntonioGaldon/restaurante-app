@@ -78,8 +78,15 @@
   <script>
     // Redirigir al home después de 2 segundos
     setTimeout(() => {
-      window.location.href = 'home.html';
-    }, 2000);
+  // Verificar si hay sesión
+  const usuario = localStorage.getItem('usuario');
+  if (usuario) {
+    window.location.href = 'home.html';
+  } else {
+    window.location.href = 'login.html';
+  }
+}, 2000);
+
     
     // Si el logo no carga, mostrar emoji
     document.querySelector('.logo').addEventListener('error', function() {
