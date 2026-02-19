@@ -17,8 +17,10 @@
   <button class="tab-btn active" data-tab="productos">📦 Productos</button>
   <button class="tab-btn" data-tab="promociones">🔥 Promociones</button>
   <button class="tab-btn" data-tab="categorias">🏷️ Categorías</button>
+  <button class="tab-btn" data-tab="subcategorias">📑 Subcategorías</button>
   <button class="tab-btn" data-tab="pedidos">📋 Pedidos</button>
 </div>
+
 
 <!-- CONTENIDO PRODUCTOS -->
 <div id="productos-tab" class="tab-content active">
@@ -82,6 +84,27 @@
     <button type="button" id="cancelarCategoria" class="cancel-btn">Cancelar</button>
   </form>
   <ul id="listaCategorias"></ul>
+</div>
+
+<!-- CONTENIDO SUBCATEGORÍAS -->
+<div id="subcategorias-tab" class="tab-content">
+  <form id="subcategoriaForm">
+    <input type="hidden" id="subcategoriaId">
+    <label for="subcategoriaNombre">Nombre de la subcategoría *</label>
+    <input type="text" id="subcategoriaNombre" placeholder="Ej: Hamburguesas" required>
+    <label for="subcategoriaCategoria">Categoría principal *</label>
+    <select id="subcategoriaCategoria" required>
+      <option value="">-- Selecciona una categoría --</option>
+    </select>
+    <label for="subcategoriaOrden">Orden de aparición</label>
+    <input type="number" id="subcategoriaOrden" placeholder="0" min="0">
+    <label>
+      <input type="checkbox" id="subcategoriaActiva" checked> Subcategoría activa
+    </label>
+    <button type="submit">Guardar Subcategoría</button>
+    <button type="button" id="cancelarSubcategoria" class="cancel-btn">Cancelar</button>
+  </form>
+  <ul id="listaSubcategorias"></ul>
 </div>
 
 <!-- CONTENIDO PEDIDOS -->
