@@ -294,6 +294,143 @@ window.eliminarPromo = async function(id) {
 };
 
 // ============================= 
+// GESTIÓN DE CATEGORÍAS
+// ============================= 
+
+const categoriaForm = document.getElementById("categoriaForm");
+const listaCategorias = document.getElementById("listaCategorias");
+const categoriaId = document.getElementById("categoriaId");
+const categoriaNombre = document.getElementById("categoriaNombre");
+const categoriaIcono = document.getElementById("categoriaIcono");
+const categoriaOrden = document.getElementById("categoriaOrden");
+const categoriaActiva = document.getElementById("categoriaActiva");
+const btnCancelarCategoria = document.getElementById("cancelarCategoria");
+
+let editandoCategoria = false;
+
+async function cargarCategorias() {
+  try {
+    const res = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await res.json();
+    listaCategorias.innerHTML = "";
+    
+    if (categorias.length === 0) {
+      listaCategorias.innerHTML = "<p style='text-align:center; color:#999;'>No hay categorías</p>";
+      return;
+    }
+    
+    categorias.forEach(cat => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="item-info">
+          <strong>${cat.icono || '📦'} ${cat.nombre}</strong>
+          <span>Orden: ${cat.orden} - ${cat.activa ? '✅ Activa' : '❌ Inactiva'}</span>
+        </div>
+        <div class="item-actions">
+          <button class="edit" onclick="editarCategoria(${cat.id})">Editar</button>
+          <button class="toggle ${cat.activa ? '' : 'inactive'}" onclick="toggleCategoria(${cat.id})">
+            ${cat.activa ? 'Desactivar' : 'Activar'}
+          </button>
+          <button class="delete" onclick="eliminarCategoria(${cat.id})">Eliminar</button>
+        </div>
+      `;
+      listaCategorias.appendChild(li);
+    });
+  } catch (err) { 
+    console.error(err); 
+    listaCategorias.innerHTML = "<p style='text-align:center; color:red;'>Error al cargar categorías</p>";
+  }
+}
+
+categoriaForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const categoriaData = {
+    nombre: categoriaNombre.value,
+    icono: categoriaIcono.value || "📦",
+    orden: parseInt(categoriaOrden.value) || 0,
+    activa: categoriaActiva.checked
+  };
+  
+  try {
+    let res;
+    if (editandoCategoria) {
+      res = await fetch(`${API_URL}/categorias/${categoriaId.value}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoriaData)
+      });
+    } else {
+      res = await fetch(`${API_URL}/categorias`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoriaData)
+      });
+    }
+    
+    if (!res.ok) throw new Error("Error guardando categoría");
+    
+    categoriaForm.reset();
+    categoriaActiva.checked = true;
+    editandoCategoria = false;
+    cargarCategorias();
+    alert("Categoría guardada correctamente");
+  } catch (err) {
+    console.error("Error guardando categoría:", err);
+    alert("Error al guardar categoría");
+  }
+});
+
+window.editarCategoria = async function(id) {
+  try {
+    const res = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await res.json();
+    const cat = categorias.find(c => c.id === id);
+    
+    if (!cat) throw new Error("Categoría no encontrada");
+    
+    categoriaId.value = cat.id;
+    categoriaNombre.value = cat.nombre;
+    categoriaIcono.value = cat.icono;
+    categoriaOrden.value = cat.orden;
+    categoriaActiva.checked = cat.activa;
+    editandoCategoria = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) { 
+    console.error(err); 
+    alert("Error al cargar categoría");
+  }
+};
+
+btnCancelarCategoria.addEventListener("click", () => {
+  categoriaForm.reset();
+  categoriaActiva.checked = true;
+  editandoCategoria = false;
+});
+
+window.toggleCategoria = async function(id) {
+  try {
+    await fetch(`${API_URL}/categorias/${id}/toggle`, { method: "PUT" });
+    cargarCategorias();
+  } catch (err) { 
+    console.error(err);
+    alert("Error al cambiar estado");
+  }
+};
+
+window.eliminarCategoria = async function(id) {
+  if (!confirm("¿Seguro que quieres eliminar esta categoría?")) return;
+  try {
+    await fetch(`${API_URL}/categorias/${id}`, { method: "DELETE" });
+    cargarCategorias();
+    alert("Categoría eliminada");
+  } catch (err) { 
+    console.error(err);
+    alert("Error al eliminar categoría");
+  }
+};
+
+
+// ============================= 
 // INICIALIZAR
 // ============================= 
 
