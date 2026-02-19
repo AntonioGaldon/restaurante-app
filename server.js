@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 const db = require("./db");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -492,6 +493,109 @@ app.put("/subcategorias/:id/toggle", async (req, res) => {
     res.status(500).json({ error: "Error al cambiar estado" });
   }
 });
+
+// ===== RUTAS API AUTENTICACIÓN =====
+
+// Registro de usuario
+app.post("/auth/registro", async (req, res) => {
+  try {
+    const { email, password, nombre, telefono, direccion } = req.body;
+    
+    if (!email || !password || !nombre) {
+      return res.status(400).json({ error: "Email, contraseña y nombre son obligatorios" });
+    }
+    
+    // Verificar si el email ya existe
+    const usuarioExistente = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    if (usuarioExistente.rows.length > 0) {
+      return res.status(400).json({ error: "El email ya está registrado" });
+    }
+    
+    // Hashear contraseña
+    const password_hash = await bcrypt.hash(password, 10);
+    
+    // Crear usuario
+    const result = await db.query(
+      "INSERT INTO usuarios (email, password_hash, nombre, telefono, direccion, rol) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, email, nombre, rol",
+      [email, password_hash, nombre, telefono || null, direccion || null, 'cliente']
+    );
+    
+    res.status(201).json({
+      message: "Usuario registrado correctamente",
+      usuario: result.rows[0]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al registrar usuario" });
+  }
+});
+
+// Login de usuario
+app.post("/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email y contraseña son obligatorios" });
+    }
+    
+    // Buscar usuario
+    const result = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Email o contraseña incorrectos" });
+    }
+    
+    const usuario = result.rows[0];
+    
+    // Verificar si está activo
+    if (!usuario.activo) {
+      return res.status(403).json({ error: "Usuario desactivado" });
+    }
+    
+    // Verificar contraseña
+    const passwordValida = await bcrypt.compare(password, usuario.password_hash);
+    if (!passwordValida) {
+      return res.status(401).json({ error: "Email o contraseña incorrectos" });
+    }
+    
+    // Devolver datos del usuario (sin la contraseña)
+    res.json({
+      message: "Login exitoso",
+      usuario: {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        telefono: usuario.telefono,
+        direccion: usuario.direccion,
+        rol: usuario.rol
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al iniciar sesión" });
+  }
+});
+
+// Obtener datos del usuario autenticado
+app.get("/auth/me/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "SELECT id, email, nombre, telefono, direccion, rol FROM usuarios WHERE id = $1",
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al obtener datos del usuario" });
+  }
+});
+
 
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
