@@ -111,7 +111,23 @@ async function generarFiltros() {
     }
   }
   
-  // Si no hay subcategorías, mostrar categorías normales
+  // Si no hay subcategorías ni productos en esta categoría, mostrar solo "Todas"
+if (categoriaURL) {
+  const productosDeLaCategoria = productos.filter(p => p.categoria === categoriaURL);
+  
+  if (productosDeLaCategoria.length === 0) {
+    // No hay productos, no mostrar filtros
+    filtrosContainer.innerHTML = "";
+    return;
+  }
+  
+  // Hay productos pero sin subcategorías, mostrar solo "Todas"
+  const btnTodas = document.createElement("button");
+  btnTodas.textContent = "Todas";
+  btnTodas.classList.add("active");
+  filtrosContainer.appendChild(btnTodas);
+} else {
+  // Pantalla general: mostrar categorías que tienen productos
   const categorias = ["Todas", ...new Set(productos.map(p => p.categoria))];
   categorias.forEach(cat => {
     const btn = document.createElement("button");
@@ -126,6 +142,7 @@ async function generarFiltros() {
     filtrosContainer.appendChild(btn);
   });
 }
+
 
 
 // =============================
