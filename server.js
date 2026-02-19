@@ -26,9 +26,6 @@ app.get("/transitions.js", (req, res) => res.sendFile(path.join(__dirname, "tran
 app.get("/install-prompt.js", (req, res) => res.sendFile(path.join(__dirname, "install-prompt.js")));
 app.get("/swipe-back.js", (req, res) => res.sendFile(path.join(__dirname, "swipe-back.js")));
 
-
-
-
 // ===== ARCHIVOS ESTÁTICOS =====
 // CSS / JS
 app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "style.css")));
@@ -49,7 +46,6 @@ app.get("/img/:filename", (req, res) => {
     if (err) res.status(404).json({ error: "Imagen no encontrada" });
   });
 });
-
 
 // ===== RUTAS API PRODUCTOS =====
 app.get("/productos", async (req, res) => {
@@ -158,14 +154,12 @@ app.get("/pedidos", async (req, res) => {
   }
 });
 
-// 🆕 POST /pedidos - Crear nuevo pedido
 app.post("/pedidos", async (req, res) => {
   const client = await db.connect();
   
   try {
     const { cliente_id, productos, alergenos, comentario, direccion, telefono } = req.body;
     
-    // Validaciones
     if (!cliente_id || !productos || productos.length === 0) {
       return res.status(400).json({ error: "cliente_id y productos son obligatorios" });
     }
@@ -176,7 +170,6 @@ app.post("/pedidos", async (req, res) => {
     
     await client.query("BEGIN");
     
-    // 1. Crear el pedido principal
     const pedidoResult = await client.query(
       `INSERT INTO pedidos (cliente_id, fecha, estado, direccion, telefono, alergenos, comentario) 
        VALUES ($1, NOW(), $2, $3, $4, $5, $6) 
@@ -186,7 +179,6 @@ app.post("/pedidos", async (req, res) => {
     
     const pedido_id = pedidoResult.rows[0].id;
     
-    // 2. Insertar los productos del pedido
     for (const item of productos) {
       await client.query(
         "INSERT INTO pedido_productos (pedido_id, producto_id, cantidad) VALUES ($1, $2, $3)",
@@ -210,7 +202,6 @@ app.post("/pedidos", async (req, res) => {
   }
 });
 
-// PUT /pedidos/:id/estado - Actualizar estado del pedido
 app.put("/pedidos/:id/estado", async (req, res) => {
   try {
     const pedido_id = req.params.id;
@@ -343,13 +334,13 @@ app.get("/categorias", async (req, res) => {
 
 app.post("/categorias", async (req, res) => {
   try {
-    const { nombre, icono, orden, activa } = req.body;
+    const { nombre, icono, imagen, orden, activa } = req.body;
     if (!nombre) {
       return res.status(400).json({ error: "El nombre es obligatorio" });
     }
     const result = await db.query(
       "INSERT INTO categorias (nombre, icono, imagen, orden, activa) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-[nombre, icono || "📦", imagen || "", orden || 0, activa !== false]
+      [nombre, icono || "📦", imagen || "", orden || 0, activa !== false]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -361,10 +352,10 @@ app.post("/categorias", async (req, res) => {
 app.put("/categorias/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, icono, orden, activa } = req.body;
+    const { nombre, icono, imagen, orden, activa } = req.body;
     const result = await db.query(
-      "UPDATE categorias SET nombre=$1, icono=$2, orden=$3, activa=$4 WHERE id=$5 RETURNING *",
-      [nombre, icono, orden, activa, id]
+      "UPDATE categorias SET nombre=$1, icono=$2, imagen=$3, orden=$4, activa=$5 WHERE id=$6 RETURNING *",
+      [nombre, icono, imagen, orden, activa, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Categoría no encontrada" });
@@ -407,10 +398,10 @@ app.put("/categorias/:id/toggle", async (req, res) => {
   }
 });
 
-
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📱 Accede desde tu red local usando tu IP`);
 });
+
