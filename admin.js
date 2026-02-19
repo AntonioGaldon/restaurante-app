@@ -1,6 +1,31 @@
 const API_URL = window.location.origin;
 
 // ============================= 
+// CARGAR CATEGORÍAS EN SELECT
+// ============================= 
+
+async function cargarCategoriasEnSelect() {
+  try {
+    const res = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await res.json();
+    const select = document.getElementById("categoria");
+    
+    // Limpiar opciones excepto la primera
+    select.innerHTML = '<option value="">-- Selecciona una categoría --</option>';
+    
+    categorias.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.nombre;
+      option.textContent = cat.nombre;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error cargando categorías:", err);
+  }
+}
+
+
+// ============================= 
 // NAVEGACIÓN
 // ============================= 
 
@@ -439,7 +464,9 @@ window.eliminarCategoria = async function(id) {
 // INICIALIZAR
 // ============================= 
 
+cargarCategoriasEnSelect();
 cargarProductos();
+
 
 // Auto-actualización según pestaña activa
 setInterval(() => {
