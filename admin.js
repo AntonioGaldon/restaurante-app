@@ -346,12 +346,14 @@ async function cargarCategorias() {
 
 categoriaForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const categoriaData = {
-    nombre: categoriaNombre.value,
-    icono: categoriaIcono.value || "📦",
-    orden: parseInt(categoriaOrden.value) || 0,
-    activa: categoriaActiva.checked
-  };
+ const categoriaData = {
+  nombre: categoriaNombre.value,
+  icono: categoriaIcono.value || "📦",
+  imagen: document.getElementById("categoriaImagen").value || "",
+  orden: parseInt(categoriaOrden.value) || 0,
+  activa: categoriaActiva.checked
+};
+
   
   try {
     let res;
