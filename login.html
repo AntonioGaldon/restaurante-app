@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6b35">
+  <title>Iniciar Sesión - El Fogón</title>
+  <link rel="stylesheet" href="login-style.css">
+</head>
+<body>
+
+<div class="container">
+  <img src="img/logo.png" alt="El Fogón" class="logo" onerror="this.style.display='none'">
+  <h1>El Fogón</h1>
+  <p class="subtitle">La Cocina de la Sierra</p>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="login">Iniciar Sesión</button>
+    <button class="tab-btn" data-tab="registro">Registrarse</button>
+  </div>
+
+  <!-- FORMULARIO LOGIN -->
+  <form id="loginForm" class="auth-form active">
+    <input type="email" id="loginEmail" placeholder="Email" required>
+    <input type="password" id="loginPassword" placeholder="Contraseña" required>
+    <button type="submit" class="btn-primary">Entrar</button>
+    <a href="#" class="link-secondary">¿Olvidaste tu contraseña?</a>
+  </form>
+
+  <!-- FORMULARIO REGISTRO -->
+  <form id="registroForm" class="auth-form">
+    <input type="text" id="registroNombre" placeholder="Nombre completo" required>
+    <input type="email" id="registroEmail" placeholder="Email" required>
+    <input type="tel" id="registroTelefono" placeholder="Teléfono (opcional)">
+    <input type="text" id="registroDireccion" placeholder="Dirección (opcional)">
+    <input type="password" id="registroPassword" placeholder="Contraseña" required>
+    <input type="password" id="registroPasswordConfirm" placeholder="Confirmar contraseña" required>
+    <button type="submit" class="btn-primary">Crear cuenta</button>
+  </form>
+
+  <button id="btnContinuarInvitado" class="btn-secondary">Continuar como invitado</button>
+</div>
+
+<script src="login.js"></script>
+
+</body>
+</html>
