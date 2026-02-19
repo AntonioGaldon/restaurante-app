@@ -73,13 +73,13 @@ app.get("/productos/:id", async (req, res) => {
 
 app.post("/productos", async (req, res) => {
   try {
-    const { nombre, descripcion, precio, categoria, img } = req.body;
+    const { nombre, descripcion, precio, categoria, subcategoria_id, img } = req.body;
     if (!nombre || !categoria || isNaN(precio))
       return res.status(400).json({ error: "Nombre, categoría y precio válido son obligatorios" });
 
     const result = await db.query(
-      "INSERT INTO productos (nombre, descripcion, precio, categoria, img) VALUES ($1,$2,$3,$4,$5) RETURNING *",
-      [nombre, descripcion || "", precio, categoria, img || ""]
+      "INSERT INTO productos (nombre, descripcion, precio, categoria, subcategoria_id, img) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+      [nombre, descripcion || "", precio, categoria, subcategoria_id || null, img || ""]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -91,11 +91,11 @@ app.post("/productos", async (req, res) => {
 app.put("/productos/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const { nombre, descripcion, precio, categoria, img } = req.body;
+    const { nombre, descripcion, precio, categoria, subcategoria_id, img } = req.body;
 
     const result = await db.query(
-      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, categoria=$4, img=$5 WHERE id=$6 RETURNING *",
-      [nombre, descripcion || "", precio, categoria, img || "", id]
+      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, categoria=$4, subcategoria_id=$5, img=$6 WHERE id=$7 RETURNING *",
+      [nombre, descripcion || "", precio, categoria, subcategoria_id || null, img || "", id]
     );
     if (result.rows.length === 0)
       return res.status(404).json({ error: "Producto no encontrado" });
@@ -493,11 +493,9 @@ app.put("/subcategorias/:id/toggle", async (req, res) => {
   }
 });
 
-
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📱 Accede desde tu red local usando tu IP`);
 });
-
