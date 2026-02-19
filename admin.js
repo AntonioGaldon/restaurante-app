@@ -57,6 +57,11 @@ tabBtns.forEach(btn => {
     if (tabName === 'productos') cargarProductos();
 if (tabName === 'promociones') cargarPromociones();
 if (tabName === 'categorias') cargarCategorias();
+if (tabName === 'subcategorias') {
+  cargarCategoriasEnSelectSubcategoria();
+  cargarSubcategorias();
+}
+
 
   });
 });
@@ -456,6 +461,167 @@ window.eliminarCategoria = async function(id) {
   } catch (err) { 
     console.error(err);
     alert("Error al eliminar categoría");
+  }
+};
+
+// ============================= 
+// GESTIÓN DE SUBCATEGORÍAS
+// ============================= 
+
+const subcategoriaForm = document.getElementById("subcategoriaForm");
+const listaSubcategorias = document.getElementById("listaSubcategorias");
+const subcategoriaId = document.getElementById("subcategoriaId");
+const subcategoriaNombre = document.getElementById("subcategoriaNombre");
+const subcategoriaCategoria = document.getElementById("subcategoriaCategoria");
+const subcategoriaOrden = document.getElementById("subcategoriaOrden");
+const subcategoriaActiva = document.getElementById("subcategoriaActiva");
+const btnCancelarSubcategoria = document.getElementById("cancelarSubcategoria");
+
+let editandoSubcategoria = false;
+
+async function cargarSubcategorias() {
+  try {
+    const res = await fetch(`${API_URL}/subcategorias?all=true`);
+    const subcategorias = await res.json();
+    
+    // Obtener nombres de categorías
+    const resCat = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await resCat.json();
+    
+    listaSubcategorias.innerHTML = "";
+    
+    if (subcategorias.length === 0) {
+      listaSubcategorias.innerHTML = "<p style='text-align:center; color:#999;'>No hay subcategorías</p>";
+      return;
+    }
+    
+    subcategorias.forEach(sub => {
+      const categoria = categorias.find(c => c.id === sub.categoria_id);
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="item-info">
+          <strong>${sub.nombre}</strong>
+          <span>${categoria ? categoria.nombre : 'Sin categoría'} - Orden: ${sub.orden} - ${sub.activa ? '✅ Activa' : '❌ Inactiva'}</span>
+        </div>
+        <div class="item-actions">
+          <button class="edit" onclick="editarSubcategoria(${sub.id})">Editar</button>
+          <button class="toggle ${sub.activa ? '' : 'inactive'}" onclick="toggleSubcategoria(${sub.id})">
+            ${sub.activa ? 'Desactivar' : 'Activar'}
+          </button>
+          <button class="delete" onclick="eliminarSubcategoria(${sub.id})">Eliminar</button>
+        </div>
+      `;
+      listaSubcategorias.appendChild(li);
+    });
+  } catch (err) { 
+    console.error(err); 
+    listaSubcategorias.innerHTML = "<p style='text-align:center; color:red;'>Error al cargar subcategorías</p>";
+  }
+}
+
+async function cargarCategoriasEnSelectSubcategoria() {
+  try {
+    const res = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await res.json();
+    const select = document.getElementById("subcategoriaCategoria");
+    
+    select.innerHTML = '<option value="">-- Selecciona una categoría --</option>';
+    
+    categorias.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.id;
+      option.textContent = cat.nombre;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error cargando categorías:", err);
+  }
+}
+
+subcategoriaForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const subcategoriaData = {
+    nombre: subcategoriaNombre.value,
+    categoria_id: parseInt(subcategoriaCategoria.value),
+    orden: parseInt(subcategoriaOrden.value) || 0,
+    activa: subcategoriaActiva.checked
+  };
+  
+  try {
+    let res;
+    if (editandoSubcategoria) {
+      res = await fetch(`${API_URL}/subcategorias/${subcategoriaId.value}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subcategoriaData)
+      });
+    } else {
+      res = await fetch(`${API_URL}/subcategorias`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subcategoriaData)
+      });
+    }
+    
+    if (!res.ok) throw new Error("Error guardando subcategoría");
+    
+    subcategoriaForm.reset();
+    subcategoriaActiva.checked = true;
+    editandoSubcategoria = false;
+    cargarSubcategorias();
+    alert("Subcategoría guardada correctamente");
+  } catch (err) {
+    console.error("Error guardando subcategoría:", err);
+    alert("Error al guardar subcategoría");
+  }
+});
+
+window.editarSubcategoria = async function(id) {
+  try {
+    const res = await fetch(`${API_URL}/subcategorias?all=true`);
+    const subcategorias = await res.json();
+    const sub = subcategorias.find(s => s.id === id);
+    
+    if (!sub) throw new Error("Subcategoría no encontrada");
+    
+    subcategoriaId.value = sub.id;
+    subcategoriaNombre.value = sub.nombre;
+    subcategoriaCategoria.value = sub.categoria_id;
+    subcategoriaOrden.value = sub.orden;
+    subcategoriaActiva.checked = sub.activa;
+    editandoSubcategoria = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) { 
+    console.error(err); 
+    alert("Error al cargar subcategoría");
+  }
+};
+
+btnCancelarSubcategoria.addEventListener("click", () => {
+  subcategoriaForm.reset();
+  subcategoriaActiva.checked = true;
+  editandoSubcategoria = false;
+});
+
+window.toggleSubcategoria = async function(id) {
+  try {
+    await fetch(`${API_URL}/subcategorias/${id}/toggle`, { method: "PUT" });
+    cargarSubcategorias();
+  } catch (err) { 
+    console.error(err);
+    alert("Error al cambiar estado");
+  }
+};
+
+window.eliminarSubcategoria = async function(id) {
+  if (!confirm("¿Seguro que quieres eliminar esta subcategoría?")) return;
+  try {
+    await fetch(`${API_URL}/subcategorias/${id}`, { method: "DELETE" });
+    cargarSubcategorias();
+    alert("Subcategoría eliminada");
+  } catch (err) { 
+    console.error(err);
+    alert("Error al eliminar subcategoría");
   }
 };
 
