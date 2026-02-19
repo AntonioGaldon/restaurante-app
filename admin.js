@@ -24,6 +24,37 @@ async function cargarCategoriasEnSelect() {
   }
 }
 
+// Cargar subcategorías cuando cambia la categoría
+document.getElementById("categoria").addEventListener("change", async (e) => {
+  const categoriaSeleccionada = e.target.value;
+  const subcategoriaSelect = document.getElementById("subcategoria");
+  
+  subcategoriaSelect.innerHTML = '<option value="">-- Sin subcategoría --</option>';
+  
+  if (!categoriaSeleccionada) return;
+  
+  try {
+    // Buscar el ID de la categoría por nombre
+    const resCat = await fetch(`${API_URL}/categorias?all=true`);
+    const categorias = await resCat.json();
+    const cat = categorias.find(c => c.nombre === categoriaSeleccionada);
+    
+    if (!cat) return;
+    
+    const res = await fetch(`${API_URL}/subcategorias?categoria_id=${cat.id}`);
+    const subcategorias = await res.json();
+    
+    subcategorias.forEach(sub => {
+      const option = document.createElement("option");
+      option.value = sub.id;
+      option.textContent = sub.nombre;
+      subcategoriaSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error cargando subcategorías:", err);
+  }
+});
+
 
 // ============================= 
 // NAVEGACIÓN
@@ -116,12 +147,14 @@ async function cargarProductos() {
 productoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const productoData = {
-    nombre: inputNombre.value,
-    descripcion: inputDescripcion.value,
-    precio: parseFloat(inputPrecio.value),
-    categoria: inputCategoria.value,
-    img: inputImg.value
-  };
+  nombre: inputNombre.value,
+  descripcion: inputDescripcion.value,
+  precio: parseFloat(inputPrecio.value),
+  categoria: inputCategoria.value,
+  subcategoria_id: document.getElementById("subcategoria").value || null,
+  img: inputImg.value
+};
+
   
   try {
     let res;
