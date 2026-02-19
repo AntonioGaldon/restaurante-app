@@ -20,6 +20,8 @@ app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.ht
 app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
 app.get("/restaurante.html", (req, res) => res.sendFile(path.join(__dirname, "restaurante.html")));
 app.get("/restaurante", (req, res) => res.sendFile(path.join(__dirname, "restaurante.html")));
+app.get("/haptic.js", (req, res) => res.sendFile(path.join(__dirname, "haptic.js")));
+
 
 
 
