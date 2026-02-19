@@ -398,6 +398,102 @@ app.put("/categorias/:id/toggle", async (req, res) => {
   }
 });
 
+// ===== RUTAS API SUBCATEGORÍAS =====
+app.get("/subcategorias", async (req, res) => {
+  try {
+    const categoria_id = req.query.categoria_id;
+    const mostrarTodas = req.query.all === 'true';
+    
+    let query = "SELECT * FROM subcategorias";
+    let params = [];
+    
+    if (categoria_id) {
+      query += " WHERE categoria_id = $1";
+      params.push(categoria_id);
+      if (!mostrarTodas) {
+        query += " AND activa = true";
+      }
+    } else if (!mostrarTodas) {
+      query += " WHERE activa = true";
+    }
+    
+    query += " ORDER BY orden, nombre";
+    
+    const result = await db.query(query, params);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar subcategorías" });
+  }
+});
+
+app.post("/subcategorias", async (req, res) => {
+  try {
+    const { nombre, categoria_id, orden, activa } = req.body;
+    if (!nombre || !categoria_id) {
+      return res.status(400).json({ error: "Nombre y categoría son obligatorios" });
+    }
+    const result = await db.query(
+      "INSERT INTO subcategorias (nombre, categoria_id, orden, activa) VALUES ($1, $2, $3, $4) RETURNING *",
+      [nombre, categoria_id, orden || 0, activa !== false]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al crear subcategoría" });
+  }
+});
+
+app.put("/subcategorias/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, categoria_id, orden, activa } = req.body;
+    const result = await db.query(
+      "UPDATE subcategorias SET nombre=$1, categoria_id=$2, orden=$3, activa=$4 WHERE id=$5 RETURNING *",
+      [nombre, categoria_id, orden, activa, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Subcategoría no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar subcategoría" });
+  }
+});
+
+app.delete("/subcategorias/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query("DELETE FROM subcategorias WHERE id=$1 RETURNING *", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Subcategoría no encontrada" });
+    }
+    res.json({ message: "Subcategoría eliminada" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar subcategoría" });
+  }
+});
+
+app.put("/subcategorias/:id/toggle", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "UPDATE subcategorias SET activa = NOT activa WHERE id=$1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Subcategoría no encontrada" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cambiar estado" });
+  }
+});
+
+
 // ===== CONFIGURACIÓN SERVIDOR =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
