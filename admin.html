@@ -33,22 +33,6 @@
     <label for="categoria">Categoría</label>
     <select id="categoria" required>
       <option value="">-- Selecciona una categoría --</option>
-      <option value="Comida">Comida</option>
-      <option value="Snacks">Snacks</option>
-      <option value="Bebidas">Bebidas</option>
-      <option value="Bebidas Alcohólicas">Bebidas Alcohólicas</option>
-      <option value="Vapers">Vapers</option>
-      <option value="Parafarmacia">Parafarmacia</option>
-      <option value="Sexshop">Sexshop</option>
-      <option value="Butano y Propano">Butano y Propano</option>
-      <option value="Panadería">Panadería</option>
-      <option value="Higiene">Higiene</option>
-      <option value="Botiquín">Botiquín</option>
-      <option value="Hogar y Mascotas">Hogar y Mascotas</option>
-      <option value="Electrónica y Regalos">Electrónica y Regalos</option>
-      <option value="Helados">Helados</option>
-      <option value="Café e Infusiones">Café e Infusiones</option>
-      <option value="Encargos">Encargos</option>
     </select>
     <label for="img">URL de la imagen</label>
     <input type="text" id="img" placeholder="https://">
@@ -85,11 +69,10 @@
     <input type="hidden" id="categoriaId">
     <label for="categoriaNombre">Nombre de la categoría *</label>
     <input type="text" id="categoriaNombre" placeholder="Ej: Snacks" required>
-   <label for="categoriaIcono">Icono (emoji)</label>
-<input type="text" id="categoriaIcono" placeholder="🍿" maxlength="10">
-<label for="categoriaImagen">URL de imagen (opcional - reemplaza al icono)</label>
-<input type="text" id="categoriaImagen" placeholder="https://...">
-
+    <label for="categoriaIcono">Icono (emoji)</label>
+    <input type="text" id="categoriaIcono" placeholder="🍿" maxlength="10">
+    <label for="categoriaImagen">URL de imagen (opcional - reemplaza al icono)</label>
+    <input type="text" id="categoriaImagen" placeholder="https://...">
     <label for="categoriaOrden">Orden de aparición</label>
     <input type="number" id="categoriaOrden" placeholder="0" min="0">
     <label>
@@ -100,7 +83,6 @@
   </form>
   <ul id="listaCategorias"></ul>
 </div>
-
 
 <!-- CONTENIDO PEDIDOS -->
 <div id="pedidos-tab" class="tab-content">
