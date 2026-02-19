@@ -15,6 +15,8 @@ app.use(express.json());
 // ===== RUTAS HTML =====
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "splash.html")));
 app.get("/splash.html", (req, res) => res.sendFile(path.join(__dirname, "splash.html")));
+app.get("/login.html", (req, res) => res.sendFile(path.join(__dirname, "login.html")));
+app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "login.html")));
 app.get("/home.html", (req, res) => res.sendFile(path.join(__dirname, "home.html")));
 app.get("/carta.html", (req, res) => res.sendFile(path.join(__dirname, "carta.html")));
 app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
@@ -30,6 +32,8 @@ app.get("/swipe-back.js", (req, res) => res.sendFile(path.join(__dirname, "swipe
 // ===== ARCHIVOS ESTÁTICOS =====
 // CSS / JS
 app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "style.css")));
+app.get("/login-style.css", (req, res) => res.sendFile(path.join(__dirname, "login-style.css")));
+app.get("/login.js", (req, res) => res.sendFile(path.join(__dirname, "login.js")));
 app.get("/home-style.css", (req, res) => res.sendFile(path.join(__dirname, "home-style.css")));
 app.get("/home.js", (req, res) => res.sendFile(path.join(__dirname, "home.js")));
 app.get("/carta.js", (req, res) => res.sendFile(path.join(__dirname, "carta.js")));
