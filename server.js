@@ -24,6 +24,7 @@ app.get("/haptic.js", (req, res) => res.sendFile(path.join(__dirname, "haptic.js
 app.get("/pull-to-refresh.js", (req, res) => res.sendFile(path.join(__dirname, "pull-to-refresh.js")));
 app.get("/transitions.js", (req, res) => res.sendFile(path.join(__dirname, "transitions.js")));
 app.get("/install-prompt.js", (req, res) => res.sendFile(path.join(__dirname, "install-prompt.js")));
+app.get("/swipe-back.js", (req, res) => res.sendFile(path.join(__dirname, "swipe-back.js")));
 
 
 
