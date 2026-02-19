@@ -30,7 +30,9 @@ tabBtns.forEach(btn => {
     document.getElementById(`${tabName}-tab`).classList.add('active');
     
     if (tabName === 'productos') cargarProductos();
-    if (tabName === 'promociones') cargarPromociones();
+if (tabName === 'promociones') cargarPromociones();
+if (tabName === 'categorias') cargarCategorias();
+
   });
 });
 
