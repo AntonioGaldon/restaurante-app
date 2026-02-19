@@ -1,35 +1,42 @@
-const categories = [
-  { name: 'Comida', icon: '🍕', path: 'carta.html?categoria=Comida' },
-  { name: 'Snacks', icon: '🍿', path: 'carta.html?categoria=Snacks' },
-  { name: 'Bebidas', icon: '🥤', path: 'carta.html?categoria=Bebidas' },
-  { name: 'Bebidas Alcohólicas', icon: '🍺', path: 'carta.html?categoria=Bebidas+Alcohólicas' },
-  { name: 'Vapers', icon: '💨', path: 'carta.html?categoria=Vapers' },
-  { name: 'Parafarmacia', icon: '💊', path: 'carta.html?categoria=Parafarmacia' },
-  { name: 'Sexshop', icon: '🔞', path: 'carta.html?categoria=Sexshop' },
-  { name: 'Butano y Propano', icon: '🔥', path: 'carta.html?categoria=Butano+y+Propano' },
-  { name: 'Panadería', icon: '🥖', path: 'carta.html?categoria=Panadería' },
-  { name: 'Higiene', icon: '🧼', path: 'carta.html?categoria=Higiene' },
-  { name: 'Botiquín', icon: '🩹', path: 'carta.html?categoria=Botiquín' },
-  { name: 'Hogar y Mascotas', icon: '🏠', path: 'carta.html?categoria=Hogar+y+Mascotas' },
-  { name: 'Electrónica y Regalos', icon: '🎁', path: 'carta.html?categoria=Electrónica+y+Regalos' },
-  { name: 'Helados', icon: '🍦', path: 'carta.html?categoria=Helados' },
-  { name: 'Café e Infusiones', icon: '☕', path: 'carta.html?categoria=Café+e+Infusiones' },
-  { name: 'Encargos', icon: '📦', path: 'carta.html?categoria=Encargos' }
-];
-
 const categoriesGrid = document.getElementById('categoriesGrid');
 const searchInput = document.getElementById('searchInput');
+
+let categories = [];
+
+// Cargar categorías desde la API
+async function cargarCategorias() {
+  try {
+    const response = await fetch(`${window.location.origin}/categorias`);
+    categories = await response.json();
+    
+    if (categories.length === 0) {
+      categoriesGrid.innerHTML = '<p style="text-align:center; color:#999;">No hay categorías disponibles</p>';
+      return;
+    }
+    
+    renderCategories();
+  } catch (error) {
+    console.error('Error cargando categorías:', error);
+    categoriesGrid.innerHTML = '<p style="text-align:center; color:#999;">Error al cargar categorías</p>';
+  }
+}
 
 function renderCategories(filteredCategories = categories) {
   categoriesGrid.innerHTML = '';
   
   filteredCategories.forEach(cat => {
     const card = document.createElement('a');
-    card.href = cat.path;
+    card.href = `carta.html?categoria=${encodeURIComponent(cat.nombre)}`;
     card.className = 'category-card';
+    
+    // Priorizar imagen sobre icono
+    const iconoHTML = cat.imagen 
+      ? `<img src="${cat.imagen}" alt="${cat.nombre}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` 
+      : cat.icono || '📦';
+    
     card.innerHTML = `
-      <div class="category-icon">${cat.icon}</div>
-      <div class="category-name">${cat.name}</div>
+      <div class="category-icon">${iconoHTML}</div>
+      <div class="category-name">${cat.nombre}</div>
     `;
     categoriesGrid.appendChild(card);
   });
@@ -38,12 +45,13 @@ function renderCategories(filteredCategories = categories) {
 searchInput.addEventListener('input', (e) => {
   const search = e.target.value.toLowerCase();
   const filtered = categories.filter(cat => 
-    cat.name.toLowerCase().includes(search)
+    cat.nombre.toLowerCase().includes(search)
   );
   renderCategories(filtered);
 });
 
-renderCategories();
+// Inicializar
+cargarCategorias();
 
 // =============================
 // PROMOCIONES
