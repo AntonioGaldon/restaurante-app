@@ -194,6 +194,34 @@ window.editarProducto = async function(id) {
     inputPrecio.value = p.precio;
     inputCategoria.value = p.categoria;
     inputImg.value = p.img;
+    
+    // Cargar subcategorías de la categoría del producto
+    if (p.categoria) {
+      const resCat = await fetch(`${API_URL}/categorias?all=true`);
+      const categorias = await resCat.json();
+      const cat = categorias.find(c => c.nombre === p.categoria);
+      
+      if (cat) {
+        const resSub = await fetch(`${API_URL}/subcategorias?categoria_id=${cat.id}`);
+        const subcategorias = await resSub.json();
+        
+        const subcategoriaSelect = document.getElementById("subcategoria");
+        subcategoriaSelect.innerHTML = '<option value="">-- Sin subcategoría --</option>';
+        
+        subcategorias.forEach(sub => {
+          const option = document.createElement("option");
+          option.value = sub.id;
+          option.textContent = sub.nombre;
+          subcategoriaSelect.appendChild(option);
+        });
+        
+        // Pre-seleccionar la subcategoría actual
+        if (p.subcategoria_id) {
+          subcategoriaSelect.value = p.subcategoria_id;
+        }
+      }
+    }
+    
     editandoProducto = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) { 
@@ -201,6 +229,7 @@ window.editarProducto = async function(id) {
     alert("Error al cargar producto");
   }
 };
+
 
 btnCancelar.addEventListener("click", () => {
   productoForm.reset();
