@@ -222,26 +222,16 @@ body {
 }
 
 .promos-scroll {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 5px 0 15px;
-}
-
-.promos-scroll::-webkit-scrollbar {
-  display: none;
 }
 
 .promo-card {
-  flex: 0 0 280px;
   background: white;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  scroll-snap-align: start;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -253,7 +243,7 @@ body {
 
 .promo-card img {
   width: 100%;
-  height: 160px;
+  height: 200px;
   object-fit: cover;
 }
 
@@ -291,6 +281,7 @@ body {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .loading {
@@ -298,6 +289,13 @@ body {
   color: var(--text-light);
   padding: 40px 20px;
 }
+
+@media (min-width: 768px) {
+  .promos-scroll {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 
 /* ============================= */
 /* CARRITO FLOTANTE */
