@@ -348,8 +348,8 @@ app.post("/categorias", async (req, res) => {
       return res.status(400).json({ error: "El nombre es obligatorio" });
     }
     const result = await db.query(
-      "INSERT INTO categorias (nombre, icono, orden, activa) VALUES ($1, $2, $3, $4) RETURNING *",
-      [nombre, icono || "📦", orden || 0, activa !== false]
+      "INSERT INTO categorias (nombre, icono, imagen, orden, activa) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+[nombre, icono || "📦", imagen || "", orden || 0, activa !== false]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
