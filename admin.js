@@ -395,6 +395,7 @@ window.editarCategoria = async function(id) {
     categoriaId.value = cat.id;
     categoriaNombre.value = cat.nombre;
     categoriaIcono.value = cat.icono;
+    document.getElementById("categoriaImagen").value = cat.imagen || "";
     categoriaOrden.value = cat.orden;
     categoriaActiva.checked = cat.activa;
     editandoCategoria = true;
