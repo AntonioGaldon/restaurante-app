@@ -172,11 +172,20 @@ app.post("/pedidos", async (req, res) => {
   const client = await db.connect();
   
   try {
-    const { cliente_id, productos, alergenos, comentario, direccion, telefono } = req.body;
-    
-    if (!cliente_id || !productos || productos.length === 0) {
-      return res.status(400).json({ error: "cliente_id y productos son obligatorios" });
-    }
+   const { cliente_id, usuario_id, productos, alergenos, comentario, direccion, telefono } = req.body;
+
+// Validaciones
+if (!productos || productos.length === 0) {
+  return res.status(400).json({ error: "Productos son obligatorios" });
+}
+
+// Usar usuario_id si existe, sino cliente_id (para compatibilidad)
+const idCliente = usuario_id || cliente_id;
+
+if (!idCliente) {
+  return res.status(400).json({ error: "Debe proporcionar un usuario" });
+}
+
     
     if (!direccion || !telefono) {
       return res.status(400).json({ error: "dirección y teléfono son obligatorios" });
