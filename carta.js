@@ -34,6 +34,10 @@ const carritoFlotante = document.getElementById("carritoFlotante");
 const cantidadCarritoBtn = document.getElementById("cantidadCarrito");
 const carritoSheet = document.getElementById("carritoSheet");
 
+// Usuario logueado
+let usuarioJSON = null;
+let usuario = null;
+
 // =============================
 // 🔹 CARGAR PRODUCTOS DESDE API
 // =============================
@@ -50,10 +54,10 @@ async function cargarProductosDesdeAPI() {
     
     await generarFiltros();
 
-// Cargar productos de la categoría si viene en la URL
-const urlParams = new URLSearchParams(window.location.search);
-const categoriaURL = urlParams.get('categoria');
-renderProductos(categoriaURL || "Todas", null);
+    // Cargar productos de la categoría si viene en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoriaURL = urlParams.get('categoria');
+    renderProductos(categoriaURL || "Todas", null);
 
   } catch (error) {
     console.error("Error cargando productos:", error);
@@ -112,38 +116,37 @@ async function generarFiltros() {
   }
   
   // Si no hay subcategorías ni productos en esta categoría, mostrar solo "Todas"
-if (categoriaURL) {
-  const productosDeLaCategoria = productos.filter(p => p.categoria === categoriaURL);
-  
-  if (productosDeLaCategoria.length === 0) {
-    // No hay productos, no mostrar filtros
-    filtrosContainer.innerHTML = "";
-    return;
-  }
-  
-  // Hay productos pero sin subcategorías, mostrar solo "Todas"
-  const btnTodas = document.createElement("button");
-  btnTodas.textContent = "Todas";
-  btnTodas.classList.add("active");
-  filtrosContainer.appendChild(btnTodas);
-} else {
-  // Pantalla general: mostrar categorías que tienen productos
-  const categorias = ["Todas", ...new Set(productos.map(p => p.categoria))];
-  categorias.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.textContent = cat;
-    if (cat === "Todas") btn.classList.add("active");
-    btn.addEventListener("click", () => {
-      const botonesActivos = filtrosContainer.querySelectorAll("button");
-      botonesActivos.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderProductos(cat, null);
+  if (categoriaURL) {
+    const productosDeLaCategoria = productos.filter(p => p.categoria === categoriaURL);
+    
+    if (productosDeLaCategoria.length === 0) {
+      // No hay productos, no mostrar filtros
+      filtrosContainer.innerHTML = "";
+      return;
+    }
+    
+    // Hay productos pero sin subcategorías, mostrar solo "Todas"
+    const btnTodas = document.createElement("button");
+    btnTodas.textContent = "Todas";
+    btnTodas.classList.add("active");
+    filtrosContainer.appendChild(btnTodas);
+  } else {
+    // Pantalla general: mostrar categorías que tienen productos
+    const categorias = ["Todas", ...new Set(productos.map(p => p.categoria))];
+    categorias.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.textContent = cat;
+      if (cat === "Todas") btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        const botonesActivos = filtrosContainer.querySelectorAll("button");
+        botonesActivos.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderProductos(cat, null);
+      });
+      filtrosContainer.appendChild(btn);
     });
-    filtrosContainer.appendChild(btn);
-  });
+  }
 }
-}
-
 
 // =============================
 // 🔹 RENDER PRODUCTOS
@@ -194,7 +197,6 @@ function renderProductos(categoria = "Todas", subcategoria_id = null) {
     renderCardContador(card, p.id);
   });
 }
-
 
 // =============================
 // 🔹 CONTADOR EN CARD
@@ -395,19 +397,19 @@ confirmarPedido.addEventListener("click", async () => {
     alert("Dirección y teléfono son obligatorios");
     return;
   }
-// Obtener usuario logueado
-const usuarioJSON = localStorage.getItem('usuario');
-if (!usuarioJSON) {
-  alert('Debes iniciar sesión para hacer un pedido');
-  window.location.href = '/login.html';
-  return;
-}
-const usuario = JSON.parse(usuarioJSON);
+  
+  // Obtener usuario logueado
+  usuarioJSON = localStorage.getItem('usuario');
+  if (!usuarioJSON) {
+    alert('Debes iniciar sesión para hacer un pedido');
+    window.location.href = '/login.html';
+    return;
+  }
+  usuario = JSON.parse(usuarioJSON);
 
-const pedidoData = {
-  cliente_id: usuario.id,
-  productos: carrito.map(item => ({
-
+  const pedidoData = {
+    usuario_id: usuario.id,
+    productos: carrito.map(item => ({
       producto_id: item.id,
       cantidad: item.cantidad
     })),
@@ -416,6 +418,7 @@ const pedidoData = {
     direccion: direccion,
     telefono: telefono
   };
+  
   try {
     const response = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
@@ -453,5 +456,3 @@ if (btnAdmin) {
 // =============================
 cargarProductosDesdeAPI();
 renderCarrito();
-
-// fix syntax error
