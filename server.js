@@ -194,11 +194,12 @@ if (!idCliente) {
     await client.query("BEGIN");
     
     const pedidoResult = await client.query(
-      `INSERT INTO pedidos (cliente_id, fecha, estado, direccion, telefono, alergenos, comentario) 
-       VALUES ($1, NOW(), $2, $3, $4, $5, $6) 
-       RETURNING id`,
-      [cliente_id, "En preparación", direccion, telefono, alergenos || null, comentario || null]
-    );
+  `INSERT INTO pedidos (cliente_id, usuario_id, fecha, estado, direccion, telefono, alergenos, comentario) 
+   VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7) 
+   RETURNING id`,
+  [idCliente, usuario_id || null, "En preparación", direccion, telefono, alergenos || null, comentario || null]
+);
+
     
     const pedido_id = pedidoResult.rows[0].id;
     
