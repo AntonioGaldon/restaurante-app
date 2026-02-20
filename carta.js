@@ -142,13 +142,13 @@ if (categoriaURL) {
     filtrosContainer.appendChild(btn);
   });
 }
-
+}
 
 
 // =============================
 // 🔹 RENDER PRODUCTOS
 // =============================
-function renderProductos(categoria = ("Todas", subcategoria_id = null) {
+function renderProductos(categoria = "Todas", subcategoria_id = null) {
   productosContainer.innerHTML = "";
   
   let filtrados = productos;
