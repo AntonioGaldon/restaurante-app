@@ -148,7 +148,7 @@ if (categoriaURL) {
 // =============================
 // 🔹 RENDER PRODUCTOS
 // =============================
-function renderProductos(categoria = "Todas", subcategoria_id = null) {
+function renderProductos(categoria = ("Todas", subcategoria_id = null) {
   productosContainer.innerHTML = "";
   
   let filtrados = productos;
