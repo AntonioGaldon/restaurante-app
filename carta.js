@@ -395,9 +395,19 @@ confirmarPedido.addEventListener("click", async () => {
     alert("Dirección y teléfono son obligatorios");
     return;
   }
-  const pedidoData = {
-    cliente_id: 1,
-    productos: carrito.map(item => ({
+// Obtener usuario logueado
+const usuarioJSON = localStorage.getItem('usuario');
+if (!usuarioJSON) {
+  alert('Debes iniciar sesión para hacer un pedido');
+  window.location.href = '/login.html';
+  return;
+}
+const usuario = JSON.parse(usuarioJSON);
+
+const pedidoData = {
+  cliente_id: usuario.id,
+  productos: carrito.map(item => ({
+
       producto_id: item.id,
       cantidad: item.cantidad
     })),
