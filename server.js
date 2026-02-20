@@ -168,6 +168,35 @@ app.get("/pedidos", async (req, res) => {
   }
 });
 
+// Obtener pedidos de un usuario específico
+app.get("/pedidos/usuario/:usuario_id", async (req, res) => {
+  try {
+    const { usuario_id } = req.params;
+    
+    const result = await db.query(`
+      SELECT 
+        p.id AS pedido_id,
+        TO_CHAR(p.fecha, 'DD/MM/YYYY HH24:MI') AS fecha,
+        STRING_AGG(pr.nombre || ' (x' || pp.cantidad || ')', ', ') AS productos,
+        SUM(pp.cantidad * pr.precio) AS total,
+        COALESCE(p.estado, 'En preparación') AS estado,
+        p.direccion,
+        p.telefono
+      FROM pedidos p
+      JOIN pedido_productos pp ON pp.pedido_id = p.id
+      JOIN productos pr ON pp.producto_id = pr.id
+      WHERE p.usuario_id = $1
+      GROUP BY p.id, p.fecha, p.estado, p.direccion, p.telefono
+      ORDER BY p.fecha DESC;
+    `, [usuario_id]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cargar pedidos del usuario" });
+  }
+});
+
 app.post("/pedidos", async (req, res) => {
   const client = await db.connect();
   
