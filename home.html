@@ -12,12 +12,12 @@
 <!-- HEADER CON GRADIENTE -->
 <header class="header-gradient">
   <div class="header-top">
-    <button class="icon-btn">
+    <button class="icon-btn" id="btnMenu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
         <path d="M3 12h18M3 6h18M3 18h18"/>
       </svg>
     </button>
-    <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+    <img src="img/logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
     <button class="icon-btn" id="btnProfile">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
         <circle cx="12" cy="12" r="10"/>
@@ -26,6 +26,12 @@
       </svg>
     </button>
   </div>
+  
+  <div class="user-info" id="userInfo" style="display:none;">
+    <p>Hola, <strong id="userName"></strong></p>
+    <button id="btnLogout" class="btn-logout">Cerrar sesión</button>
+  </div>
+
   
  <div class="header-content">
   <img src="img/logo.png" alt="El Fogón" class="logo-main" onerror="this.style.display='none'">
