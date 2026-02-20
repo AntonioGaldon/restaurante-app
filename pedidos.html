@@ -2,54 +2,31 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pedidos del Cliente</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { border-collapse: collapse; width: 80%; margin-bottom: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6b35">
+  <title>Mis Pedidos - El Fogón</title>
+  <link rel="stylesheet" href="pedidos-style.css">
 </head>
 <body>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='/'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
   <h1>Mis Pedidos</h1>
-  <table id="pedidosTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Fecha</th>
-        <th>Productos</th>
-        <th>Total</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div style="width:40px;"></div>
+</header>
 
-  <script>
-    const API_URL = "http://localhost:5000";
-    const CLIENTE_ID = 2; // Aquí puedes cambiar por el cliente actual
+<main>
+  <div id="pedidosContainer" class="pedidos-container">
+    <p class="loading">Cargando pedidos...</p>
+  </div>
+</main>
 
-    async function cargarPedidos() {
-      const res = await fetch(`${API_URL}/pedidos`);
-      const pedidos = await res.json();
-      const tbody = document.querySelector("#pedidosTable tbody");
-      tbody.innerHTML = "";
-      pedidos
-        .filter(p => p.cliente_id === CLIENTE_ID) // mostrar solo pedidos de este cliente
-        .forEach(p => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${p.pedido_id}</td>
-            <td>${p.fecha}</td>
-            <td>${p.productos}</td>
-            <td>${p.total}</td>
-            <td>${p.estado || "pendiente"}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-    }
+<script src="haptic.js"></script>
+<script src="pedidos.js"></script>
 
-    cargarPedidos();
-  </script>
 </body>
 </html>
