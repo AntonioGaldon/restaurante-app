@@ -93,6 +93,45 @@ async function cargarPromociones() {
   }
 }
 
+// =============================
+// 🔹 GESTIÓN DE USUARIO
+// =============================
+
+const userInfo = document.getElementById('userInfo');
+const userName = document.getElementById('userName');
+const btnLogout = document.getElementById('btnLogout');
+const btnProfile = document.getElementById('btnProfile');
+
+// Mostrar info del usuario si está logueado
+const usuarioJSON = localStorage.getItem('usuario');
+if (usuarioJSON) {
+  const usuario = JSON.parse(usuarioJSON);
+  userName.textContent = usuario.nombre;
+  userInfo.style.display = 'block';
+}
+
+// Botón de perfil
+if (btnProfile) {
+  btnProfile.addEventListener('click', () => {
+    if (usuarioJSON) {
+      // Ir a perfil (lo crearemos después)
+      alert('Panel de perfil próximamente');
+    } else {
+      window.location.href = '/login.html';
+    }
+  });
+}
+
+// Cerrar sesión
+if (btnLogout) {
+  btnLogout.addEventListener('click', () => {
+    if (confirm('¿Seguro que quieres cerrar sesión?')) {
+      localStorage.removeItem('usuario');
+      window.location.href = '/login.html';
+    }
+  });
+}
+
 cargarPromociones();
 
 // Auto-actualización cada 10 segundos
