@@ -114,13 +114,13 @@ if (usuarioJSON) {
 if (btnProfile) {
   btnProfile.addEventListener('click', () => {
     if (usuarioJSON) {
-      // Ir a perfil (lo crearemos después)
-      alert('Panel de perfil próximamente');
+      window.location.href = '/pedidos.html';
     } else {
       window.location.href = '/login.html';
     }
   });
 }
+
 
 // Cerrar sesión
 if (btnLogout) {
