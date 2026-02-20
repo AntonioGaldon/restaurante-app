@@ -37,6 +37,10 @@ app.get("/pull-to-refresh.js", (req, res) => res.sendFile(path.join(__dirname, "
 app.get("/transitions.js", (req, res) => res.sendFile(path.join(__dirname, "transitions.js")));
 app.get("/install-prompt.js", (req, res) => res.sendFile(path.join(__dirname, "install-prompt.js")));
 app.get("/swipe-back.js", (req, res) => res.sendFile(path.join(__dirname, "swipe-back.js")));
+app.get("/pedidos.html", (req, res) => res.sendFile(path.join(__dirname, "pedidos.html")));
+app.get("/pedidos-style.css", (req, res) => res.sendFile(path.join(__dirname, "pedidos-style.css")));
+app.get("/pedidos.js", (req, res) => res.sendFile(path.join(__dirname, "pedidos.js")));
+
 
 // ===== ARCHIVOS ESTÁTICOS =====
 // CSS / JS
