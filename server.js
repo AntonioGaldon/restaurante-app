@@ -5,6 +5,7 @@ const path = require("path");
 require("dotenv").config();
 const db = require("./db");
 const bcrypt = require("bcrypt");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
@@ -653,6 +654,41 @@ app.get("/auth/me/:id", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Error al obtener datos del usuario" });
   }
+});
+
+// ===== RUTAS API STRIPE =====
+
+// Crear intención de pago
+app.post("/create-payment-intent", async (req, res) => {
+  try {
+    const { amount } = req.body; // amount en céntimos (ej: 1050 = 10.50€)
+    
+    if (!amount || amount < 50) {
+      return res.status(400).json({ error: "El importe mínimo es 0.50€" });
+    }
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "eur",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+    
+    res.json({
+      clientSecret: paymentIntent.client_secret
+    });
+  } catch (err) {
+    console.error("Error creando payment intent:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Obtener clave publicable
+app.get("/stripe-config", (req, res) => {
+  res.json({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
+  });
 });
 
 
