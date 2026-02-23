@@ -14,8 +14,8 @@ refreshIndicator.innerHTML = '↓';
 document.body.insertBefore(refreshIndicator, document.body.firstChild);
 
 // Estilos del indicador
-const style = document.createElement('style');
-style.textContent = `
+const stylePullToRefresh = document.createElement('style');
+stylePullToRefresh.textContent = `
   .refresh-indicator {
     position: fixed;
     top: -60px;
@@ -47,7 +47,7 @@ style.textContent = `
     to { transform: translateX(-50%) rotate(360deg); }
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(stylePullToRefresh);
 
 // Detectar inicio del pull
 document.addEventListener('touchstart', (e) => {
