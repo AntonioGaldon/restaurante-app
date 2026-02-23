@@ -15,8 +15,8 @@ swipeIndicator.innerHTML = '←';
 document.body.appendChild(swipeIndicator);
 
 // Estilos
-const style = document.createElement('style');
-style.textContent = `
+const styleSwipe = document.createElement('style');
+styleSwipe.textContent = `
   .swipe-indicator {
     position: fixed;
     left: -60px;
@@ -41,7 +41,7 @@ style.textContent = `
     left: 20px;
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(styleSwipe);
 
 // Detectar inicio del swipe
 document.addEventListener('touchstart', (e) => {
