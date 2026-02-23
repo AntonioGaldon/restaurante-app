@@ -41,8 +41,8 @@ document.addEventListener('click', (e) => {
 window.navigateWithTransition = navigateWithTransition;
 
 // Animación para modales
-const style = document.createElement('style');
-style.textContent = `
+const styleTransitions = document.createElement('style');
+styleTransitions.textContent = `
   .modal {
     animation: fadeIn 0.3s ease;
   }
@@ -65,4 +65,4 @@ style.textContent = `
     to { transform: translateY(0); }
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(styleTransitions);
