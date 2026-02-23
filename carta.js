@@ -407,29 +407,43 @@ confirmarPedido.addEventListener("click", async () => {
   }
   usuario = JSON.parse(usuarioJSON);
 
-  const pedidoData = {
-    usuario_id: usuario.id,
-    productos: carrito.map(item => ({
-      producto_id: item.id,
-      cantidad: item.cantidad
-    })),
-    alergenos: alergenosInput.value,
-    comentario: comentarioPedidoInput.value,
-    direccion: direccion,
-    telefono: telefono
-  };
-  
+  // Calcular total en céntimos
+  const total = carrito.reduce((sum, i) => sum + (i.precio * i.cantidad), 0);
+  const totalCentimos = Math.round(total * 100);
+
+  // Mostrar modal de pago
+  pedidoModal.classList.remove("show");
+  mostrarModalPago(totalCentimos, direccion, telefono);
+});
+
+// =============================
+// 🔹 MODAL DE PAGO STRIPE
+// =============================
+async function mostrarModalPago(totalCentimos, direccion, telefono) {
   try {
+    const pedidoData = {
+      usuario_id: usuario.id,
+      productos: carrito.map(item => ({
+        producto_id: item.id,
+        cantidad: item.cantidad
+      })),
+      alergenos: alergenosInput.value,
+      comentario: comentarioPedidoInput.value,
+      direccion: direccion,
+      telefono: telefono
+    };
+    
     const response = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pedidoData)
     });
+    
     if (!response.ok) throw new Error("Error al crear el pedido");
-    alert("¡Pedido realizado con éxito! ✅");
+    
+    alert("¡Pedido realizado con éxito! ✅\n(Pago con Stripe próximamente)");
     carrito = [];
     renderCarrito();
-    pedidoModal.classList.remove("show");
     alergenosInput.value = "";
     comentarioPedidoInput.value = "";
     direccionEntregaInput.value = "";
@@ -438,8 +452,10 @@ confirmarPedido.addEventListener("click", async () => {
   } catch (error) {
     console.error("Error al crear pedido:", error);
     alert("Error al realizar el pedido. Por favor, intenta de nuevo.");
+    pedidoModal.classList.add("show");
   }
-});
+}
+
 
 // =============================
 // 🔹 BOTÓN ADMIN
