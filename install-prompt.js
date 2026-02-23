@@ -21,8 +21,8 @@ function createInstallButton() {
   document.body.appendChild(installButton);
   
   // Estilos
-  const style = document.createElement('style');
-  style.textContent = `
+  const styleInstall = document.createElement('style');
+  styleInstall.textContent = `
     .install-app-btn {
       position: fixed;
       bottom: 90px;
