@@ -68,7 +68,7 @@ function createInstallButton() {
       }
     }
   `;
-  document.head.appendChild(style);
+  document.head.appendChild(styleInstall);
 }
 
 // Capturar evento de instalación
