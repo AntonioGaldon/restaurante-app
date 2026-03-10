@@ -491,6 +491,11 @@ document.getElementById('confirmarPagoStripe').addEventListener('click', async (
 });
 
 async function crearPedidoDespuesDePago() {
+  console.log('🔵 Iniciando creación de pedido después de pago');
+  console.log('🔵 Usuario:', usuario);
+  console.log('🔵 Carrito:', carrito);
+  console.log('🔵 Datos temp:', window.pedidoTemp);
+  
   try {
     const pedidoData = {
       usuario_id: usuario.id,
@@ -504,13 +509,23 @@ async function crearPedidoDespuesDePago() {
       telefono: window.pedidoTemp.telefono
     };
     
+    console.log('🟢 Pedido a enviar:', pedidoData);
+    
     const response = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pedidoData)
     });
     
-    if (!response.ok) throw new Error("Error al crear el pedido");
+    console.log('🟡 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error del servidor:', errorData);
+      throw new Error(errorData.error || "Error al crear el pedido");
+    }
+    
+    console.log('✅ Pedido creado exitosamente');
     
     document.getElementById('pagoModal').classList.remove('show');
     alert("¡Pago realizado y pedido confirmado! ✅");
@@ -523,10 +538,11 @@ async function crearPedidoDespuesDePago() {
     telefonoContactoInput.value = "";
     renderProductos();
   } catch (error) {
-    console.error("Error al crear pedido:", error);
+    console.error("❌ Error completo:", error);
     alert("Pago realizado pero hubo un error al crear el pedido. Contacta con soporte.");
   }
 }
+
 
 
 
