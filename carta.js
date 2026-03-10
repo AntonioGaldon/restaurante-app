@@ -453,15 +453,8 @@ async function mostrarModalPago(totalCentimos, direccion, telefono) {
     
     // Guardar datos del pedido para después del pago
     window.pedidoTemp = { direccion, telefono };
-    
-  } catch (error) {
-    console.error('Error iniciando pago:', error);
-    alert('Error al iniciar el pago. Intenta de nuevo.');
-    pedidoModal.classList.add('show');
-  }
-}
 
-// Botón cancelar pago
+    // Botón cancelar pago
 document.getElementById('cancelarPago').addEventListener('click', () => {
   document.getElementById('pagoModal').classList.remove('show');
   pedidoModal.classList.add('show');
@@ -496,6 +489,13 @@ document.getElementById('confirmarPagoStripe').addEventListener('click', async (
     console.log('⚠️ Estado del pago:', paymentIntent?.status);
   }
 });
+    
+  } catch (error) {
+    console.error('Error iniciando pago:', error);
+    alert('Error al iniciar el pago. Intenta de nuevo.');
+    pedidoModal.classList.add('show');
+  }
+}
 
 
 async function crearPedidoDespuesDePago() {
