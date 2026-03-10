@@ -473,7 +473,9 @@ document.getElementById('confirmarPagoStripe').addEventListener('click', async (
   messageDiv.className = 'payment-message';
   messageDiv.textContent = '';
   
-  const { error } = await stripe.confirmPayment({
+  console.log('💳 Procesando pago...');
+  
+  const { error, paymentIntent } = await stripe.confirmPayment({
     elements,
     confirmParams: {
       return_url: `${window.location.origin}/carta.html`,
@@ -481,14 +483,20 @@ document.getElementById('confirmarPagoStripe').addEventListener('click', async (
     redirect: 'if_required'
   });
   
+  console.log('💳 Respuesta de Stripe:', { error, paymentIntent });
+  
   if (error) {
     messageDiv.className = 'payment-message error';
     messageDiv.textContent = error.message;
-  } else {
-    // Pago exitoso, crear pedido
+    console.error('❌ Error en pago:', error);
+  } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+    console.log('✅ Pago exitoso, creando pedido...');
     await crearPedidoDespuesDePago();
+  } else {
+    console.log('⚠️ Estado del pago:', paymentIntent?.status);
   }
 });
+
 
 async function crearPedidoDespuesDePago() {
   console.log('🔵 Iniciando creación de pedido después de pago');
