@@ -419,7 +419,78 @@ confirmarPedido.addEventListener("click", async () => {
 // =============================
 // 🔹 MODAL DE PAGO STRIPE
 // =============================
+let stripe = null;
+let elements = null;
+let clientSecret = null;
+
 async function mostrarModalPago(totalCentimos, direccion, telefono) {
+  try {
+    // Obtener clave publicable de Stripe
+    const configRes = await fetch(`${API_URL}/stripe-config`);
+    const { publishableKey } = await configRes.json();
+    
+    // Inicializar Stripe
+    stripe = Stripe(publishableKey);
+    
+    // Crear Payment Intent
+    const paymentRes = await fetch(`${API_URL}/create-payment-intent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: totalCentimos })
+    });
+    
+    const { clientSecret: secret } = await paymentRes.json();
+    clientSecret = secret;
+    
+    // Crear elementos de pago
+    elements = stripe.elements({ clientSecret });
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+    
+    // Mostrar modal y total
+    document.getElementById('pagoModal').classList.add('show');
+    document.getElementById('modalTotal').textContent = `${(totalCentimos / 100).toFixed(2)} €`;
+    
+    // Guardar datos del pedido para después del pago
+    window.pedidoTemp = { direccion, telefono };
+    
+  } catch (error) {
+    console.error('Error iniciando pago:', error);
+    alert('Error al iniciar el pago. Intenta de nuevo.');
+    pedidoModal.classList.add('show');
+  }
+}
+
+// Botón cancelar pago
+document.getElementById('cancelarPago').addEventListener('click', () => {
+  document.getElementById('pagoModal').classList.remove('show');
+  pedidoModal.classList.add('show');
+});
+
+// Botón confirmar pago
+document.getElementById('confirmarPagoStripe').addEventListener('click', async () => {
+  const messageDiv = document.getElementById('payment-message');
+  messageDiv.className = 'payment-message';
+  messageDiv.textContent = '';
+  
+  const { error } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: `${window.location.origin}/carta.html`,
+    },
+    redirect: 'if_required'
+  });
+  
+  if (error) {
+    messageDiv.className = 'payment-message error';
+    messageDiv.textContent = error.message;
+  } else {
+    // Pago exitoso, crear pedido
+    await crearPedidoDespuesDePago();
+  }
+});
+
+async function crearPedidoDespuesDePago() {
   try {
     const pedidoData = {
       usuario_id: usuario.id,
@@ -429,8 +500,8 @@ async function mostrarModalPago(totalCentimos, direccion, telefono) {
       })),
       alergenos: alergenosInput.value,
       comentario: comentarioPedidoInput.value,
-      direccion: direccion,
-      telefono: telefono
+      direccion: window.pedidoTemp.direccion,
+      telefono: window.pedidoTemp.telefono
     };
     
     const response = await fetch(`${API_URL}/pedidos`, {
@@ -441,7 +512,9 @@ async function mostrarModalPago(totalCentimos, direccion, telefono) {
     
     if (!response.ok) throw new Error("Error al crear el pedido");
     
-    alert("¡Pedido realizado con éxito! ✅\n(Pago con Stripe próximamente)");
+    document.getElementById('pagoModal').classList.remove('show');
+    alert("¡Pago realizado y pedido confirmado! ✅");
+    
     carrito = [];
     renderCarrito();
     alergenosInput.value = "";
@@ -451,10 +524,10 @@ async function mostrarModalPago(totalCentimos, direccion, telefono) {
     renderProductos();
   } catch (error) {
     console.error("Error al crear pedido:", error);
-    alert("Error al realizar el pedido. Por favor, intenta de nuevo.");
-    pedidoModal.classList.add("show");
+    alert("Pago realizado pero hubo un error al crear el pedido. Contacta con soporte.");
   }
 }
+
 
 
 // =============================
