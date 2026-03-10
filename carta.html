@@ -7,6 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
   <title>Productos - El Fogón</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
@@ -93,6 +94,22 @@
     </div>
   </div>
 </div>
+  <!-- MODAL DE PAGO STRIPE -->
+  <div class="modal" id="pagoModal">
+    <div class="modal-content">
+      <h2>Pago seguro</h2>
+      <div id="payment-element"></div>
+      <div class="modal-total">
+        <span>Total a pagar:</span>
+        <strong id="modalTotal">0.00 </strong>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelarPago" class="cancel-btn">Cancelar</button>
+        <button id="confirmarPagoStripe" class="confirm-btn">Pagar</button>
+      </div>
+      <div id="payment-message" class="payment-message"></div>
+    </div>
+  </div>
 
 <script src="haptic.js"></script>
 <script src="pull-to-refresh.js"></script>
