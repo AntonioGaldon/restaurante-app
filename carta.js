@@ -442,10 +442,22 @@ async function mostrarModalPago(totalCentimos, direccion, telefono) {
     const { clientSecret: secret } = await paymentRes.json();
     clientSecret = secret;
     
-    // Crear elementos de pago
-    elements = stripe.elements({ clientSecret });
-    const paymentElement = elements.create('payment');
-    paymentElement.mount('#payment-element');
+// Crear elementos de pago
+const appearance = {
+  theme: 'stripe',
+};
+elements = stripe.elements({ clientSecret, appearance });
+const paymentElement = elements.create('payment');
+
+// Montar el elemento con manejo de errores
+try {
+  await paymentElement.mount('#payment-element');
+  console.log('✅ Elemento de pago montado correctamente');
+} catch (error) {
+  console.error('❌ Error montando elemento de pago:', error);
+  throw error;
+}
+
     
     // Mostrar modal y total
     document.getElementById('pagoModal').classList.add('show');
